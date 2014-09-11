@@ -29,6 +29,21 @@ public class Tools {
     return result;
   }
 
+  /**
+   * 
+   * @param dateStr
+   * @return
+   */
+  public static String getStartEndStr(String dateStr) {
+    Date date = getDateByStr(dateStr);
+    Date today = new Date(System.currentTimeMillis());
+    String formaterStr = "yyyy/MM/dd HH:mm";
+    if (date.getYear() == today.getYear()) {
+      formaterStr = "MM/dd HH:mm";
+    }
+    return new SimpleDateFormat(formaterStr, Locale.ENGLISH).format(date);
+  }
+
   public static int daysOfTwo(Date fDate, Date oDate) {
     Calendar aCalendar = Calendar.getInstance();
     aCalendar.setTime(fDate);

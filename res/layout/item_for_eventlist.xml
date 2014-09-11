@@ -9,8 +9,6 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
         android:orientation="vertical" >
 
         <TextView
@@ -80,6 +78,20 @@
                     android:paddingTop="4dp"
                     android:singleLine="true"
                     android:text="南京 鼓楼区 南京先锋书店五台山店（广州路173号）"
+                    android:textColor="@color/black"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/event_owner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawableLeft="@drawable/icon_sponsor"
+                    android:gravity="center_vertical|left"
+                    android:paddingBottom="4dp"
+                    android:paddingLeft="8dp"
+                    android:paddingTop="4dp"
+                    android:singleLine="true"
+                    android:text="北京英语角"
                     android:textColor="@color/black"
                     android:textSize="13sp" />
 

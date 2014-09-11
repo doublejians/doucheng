@@ -1,11 +1,16 @@
 package com.yaya.douban.tongcheng.types;
 
-public class User extends SimpleUser {
+public class User {
 
   private boolean is_banned;
   private boolean is_suicide;
-  private String type;
   private String large_avatar;
+  protected String avatar;
+  protected String alt;
+  protected String id;
+  protected String name;
+  protected String uid;
+  protected String type; // user,site
 
   public boolean isIs_banned() {
     return is_banned;
@@ -37,6 +42,46 @@ public class User extends SimpleUser {
 
   public void setLarge_avatar(String large_avatar) {
     this.large_avatar = large_avatar;
+  }
+
+  public String getAvatar() {
+    return avatar;
+  }
+
+  public void setAvatar(String avatar) {
+    this.avatar = avatar;
+  }
+
+  public String getAlt() {
+    return alt;
+  }
+
+  public void setAlt(String alt) {
+    this.alt = alt;
+  }
+
+  public String getId() {
+    return id;
+  }
+
+  public void setId(String id) {
+    this.id = id;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public String getUid() {
+    return uid;
+  }
+
+  public void setUid(String uid) {
+    this.uid = uid;
   }
 
 }

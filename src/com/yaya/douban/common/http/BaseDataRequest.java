@@ -16,8 +16,10 @@ public abstract class BaseDataRequest implements Runnable {
 
   public static final String URL_DEFAULT = "https://api.douban.com";
   public static final String PATH_LOCS_CITIES = "/v2/loc/list";
-  public static final String PATH_EVENT_LIST = "/v2/event/list";
   public static final String PATH_LOCS_DISTRICTS = "/v2/loc/%1$s/districts";
+  public static final String PATH_EVENT_DETAIL = "/v2/event/%1$s";
+  public static final String PATH_EVENT_LIST = "/v2/event/list";
+  public static final String PATH_EVENT_PHOTOS = "/v2/event/%1$s/photos";
 
   public static final String PARAM_START = "start";
   public static final String PARAM_COUNT = "count";
@@ -82,7 +84,8 @@ public abstract class BaseDataRequest implements Runnable {
 
   private String buildRealUrl() {
     StringBuilder builder = new StringBuilder();
-    builder.append(url + (url.endsWith("/") ? "" : "/") + path);
+    builder.append(url
+        + ((url.endsWith("/") || path.startsWith("/")) ? "" : "/") + path);
     if (values.isEmpty() || requestMethod != 0) {
       return builder.toString();
     }

@@ -78,9 +78,10 @@ public class TCEventListAdapter extends BaseAdapter {
 
       holder.endTv = (TextView) convertView.findViewById(R.id.event_endtxt);
 
-      holder.feeTv = (TextView) convertView.findViewById(R.id.event_fee);
+      // holder.feeTv = (TextView) convertView.findViewById(R.id.event_fee);
       holder.wisherTv = (TextView) convertView
           .findViewById(R.id.event_wishercount);
+      holder.ownerTv = (TextView) convertView.findViewById(R.id.event_owner);
 
       holder.participantTv = (TextView) convertView
           .findViewById(R.id.event_participant);
@@ -91,7 +92,18 @@ public class TCEventListAdapter extends BaseAdapter {
     }
 
     holder.titleTv.setText(event.getTitle());
-    holder.dateTv.setText(event.getBegin_time() + "-" + event.getEnd_time());
+    String startStr = Tools.getStartEndStr(event.getBegin_time());
+    String endStr = Tools.getStartEndStr(event.getEnd_time());
+    String[] startStrs = startStr.split(" ");
+    String[] endStrs = endStr.split(" ");
+    StringBuilder dateBuilder = new StringBuilder();
+    dateBuilder.append(startStr + "-");
+    if (startStrs[0].equals(endStrs[0])) {
+      dateBuilder.append(endStrs[1]);
+    } else {
+      dateBuilder.append(endStr);
+    }
+    holder.dateTv.setText(dateBuilder.toString());
     holder.addressTv.setText(event.getAddress());
     String subCategory = event.getSubcategory_name();
     holder.typeTv.setText(event.getCategory_name()
@@ -104,9 +116,10 @@ public class TCEventListAdapter extends BaseAdapter {
     holder.participantTv.setText(Html.fromHtml("<big><font color='#ba142b'>"
         + event.getParticipant_count() + "</font></big>参加"));
     imgLoader.displayImage(event.getImage(), holder.previewIv, options);
-    boolean isFree = !event.isHas_ticket();
-    holder.feeTv.setText(Html
-        .fromHtml(isFree ? "<big><font color='#ba142b'>免费</font><big>" : "收费"));
+    // boolean isFree = !event.isHas_ticket();
+    // holder.feeTv.setText(Html
+    // .fromHtml(isFree ? "<big><font color='#ba142b'>免费</font><big>" : "收费"));
+    holder.ownerTv.setText("主办方：" + event.getOwner().getName());
     convertView.setTag(holder);
     return convertView;
   }
@@ -127,7 +140,7 @@ public class TCEventListAdapter extends BaseAdapter {
 
   class ViewHolder {
     TextView titleTv, dateTv, addressTv, typeTv, endTv, wisherTv,
-        participantTv, feeTv;
+        participantTv, ownerTv;
     ImageView previewIv;
   }
 }

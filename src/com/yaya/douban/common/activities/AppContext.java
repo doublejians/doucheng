@@ -1,7 +1,6 @@
 package com.yaya.douban.common.activities;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 import android.app.Application;
@@ -18,6 +17,7 @@ import com.yaya.douban.common.utils.AppLog;
 import com.yaya.douban.tongcheng.requests.TCLocListRequest;
 import com.yaya.douban.tongcheng.responses.TCLocListResponse;
 import com.yaya.douban.tongcheng.types.Loc;
+import com.yaya.douban.tongcheng.types.TCEvent;
 
 public class AppContext extends Application {
   public final static String INTENT_DISTICTS_WEB_RESULT = "com.doutongcheng.change.disticts";
@@ -28,7 +28,8 @@ public class AppContext extends Application {
   private static AppContext instance = new AppContext();
 
   private Loc currentLoc;
-  private HashMap<String, ArrayList<Loc>> disticts = new HashMap<String, ArrayList<Loc>>();
+  private TCEvent currentEvent;
+  private LinkedHashMap<String, ArrayList<Loc>> disticts = new LinkedHashMap<String, ArrayList<Loc>>();
 
   @Override
   public void onCreate() {
@@ -99,7 +100,6 @@ public class AppContext extends Application {
     return getDistricts(key);
   }
 
-
   public static LinkedHashMap<String, String> getEventTypes() {
     return eventTypes;
   }
@@ -115,6 +115,14 @@ public class AppContext extends Application {
   public static void setEventDayTypes(
       LinkedHashMap<String, String> eventDayTypes) {
     AppContext.eventDayTypes = eventDayTypes;
+  }
+
+  public TCEvent getCurrentEvent() {
+    return currentEvent;
+  }
+
+  public void setCurrentEvent(TCEvent currentEvent) {
+    this.currentEvent = currentEvent;
   }
 
   private void requestDisricts() {
