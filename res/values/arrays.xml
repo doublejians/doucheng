@@ -2,7 +2,7 @@
 <resources>
 
     <string-array name="tc_event_types">
-        <item>全部 all</item>
+        <item>全部类型 all</item>
         <item>音乐 music</item>
         <item>电影 film</item>
         <item>展览 exhibition</item>
@@ -15,7 +15,7 @@
         <item>其他 others</item>
     </string-array>
     <string-array name="tc_event_day_type">
-        <item>全部 future</item>
+        <item>全部时间 future</item>
         <item>最近一周 week</item>
         <item>今天 today</item>
         <item>明天 tomorrow</item>

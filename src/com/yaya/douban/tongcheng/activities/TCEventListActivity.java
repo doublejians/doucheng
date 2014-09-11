@@ -1,6 +1,7 @@
 package com.yaya.douban.tongcheng.activities;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import android.os.Bundle;
 import android.view.View;
@@ -28,7 +29,7 @@ public class TCEventListActivity extends TCBaseActivity implements
   private TCEventListAdapter adapter;
   private TCEventListRequest request;
   private int currentStart = 0;
-  private String type = "all", daytype = "today", loc = "118159",
+  private String type = "all", daytype = "future", loc = "118159",
       district = "";
 
   @Override
@@ -73,11 +74,48 @@ public class TCEventListActivity extends TCBaseActivity implements
   @Override
   public void onClick(View v) {
     switch (v.getId()) {
-    case R.id.type:
+    case R.id.type: {
+      final ArrayList<String> strs = getTypeArray();
+      TCMenuPopup pop = new TCMenuPopup(this, typeBt, strs,
+          new IMenuItemCallback() {
+            @Override
+            public void onItemSelected(int position) {
+              String typeStr = strs.get(position);
+              typeBt.setText(typeStr);
+              String selectType = AppContext.getInstance().getEventTypes()
+                  .get(typeStr);
+
+              if (type == null || !type.equals(selectType)) {
+                currentStart = 0;
+                type = selectType;
+                requestEvents();
+              }
+            }
+          });
+      pop.showAsDropDown();
+    }
       break;
-    case R.id.daytype:
+    case R.id.daytype: {
+      final ArrayList<String> strs = getDayTypeArray();
+      TCMenuPopup pop = new TCMenuPopup(this, dayTypeBt, strs,
+          new IMenuItemCallback() {
+            @Override
+            public void onItemSelected(int position) {
+              dayTypeBt.setText(strs.get(position));
+              String selectdayType = AppContext.getInstance()
+                  .getEventDayTypes().get(strs.get(position));
+
+              if (!daytype.equals(selectdayType)) {
+                currentStart = 0;
+                daytype = selectdayType;
+                requestEvents();
+              }
+            }
+          });
+      pop.showAsDropDown();
+    }
       break;
-    case R.id.loc:
+    case R.id.loc: {
       final ArrayList<String> strs = getLocArray();
       AppLog.e("xxxLocs", "locs---->" + strs.size());
       TCMenuPopup pop = new TCMenuPopup(this, locTypeBt, strs,
@@ -102,10 +140,26 @@ public class TCEventListActivity extends TCBaseActivity implements
             }
           });
       pop.showAsDropDown();
+    }
       break;
     default:
       break;
     }
+  }
+
+  private ArrayList<String> getTypeArray() {
+    ArrayList<String> array = new ArrayList<String>();
+    HashMap<String, String> types = AppContext.getInstance().getEventTypes();
+    array.addAll(types.keySet());
+    return array;
+  }
+
+  private ArrayList<String> getDayTypeArray() {
+    ArrayList<String> array = new ArrayList<String>();
+    HashMap<String, String> dayTypes = AppContext.getInstance()
+        .getEventDayTypes();
+    array.addAll(dayTypes.keySet());
+    return array;
   }
 
   private ArrayList<String> getLocArray() {

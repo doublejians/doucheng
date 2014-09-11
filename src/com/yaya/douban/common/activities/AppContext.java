@@ -2,6 +2,7 @@ package com.yaya.douban.common.activities;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import android.app.Application;
 import android.content.Intent;
@@ -21,8 +22,8 @@ import com.yaya.douban.tongcheng.types.Loc;
 public class AppContext extends Application {
   public final static String INTENT_DISTICTS_WEB_RESULT = "com.doutongcheng.change.disticts";
 
-  public static HashMap<String, String> eventTypes = new HashMap<String, String>();
-  public static HashMap<String, String> eventDayTypes = new HashMap<String, String>();
+  public static LinkedHashMap<String, String> eventTypes = new LinkedHashMap<String, String>();
+  public static LinkedHashMap<String, String> eventDayTypes = new LinkedHashMap<String, String>();
 
   private static AppContext instance = new AppContext();
 
@@ -96,6 +97,24 @@ public class AppContext extends Application {
   public ArrayList<Loc> getDistricts() {
     String key = currentLoc.getName();
     return getDistricts(key);
+  }
+
+
+  public static LinkedHashMap<String, String> getEventTypes() {
+    return eventTypes;
+  }
+
+  public static void setEventTypes(LinkedHashMap<String, String> eventTypes) {
+    AppContext.eventTypes = eventTypes;
+  }
+
+  public static LinkedHashMap<String, String> getEventDayTypes() {
+    return eventDayTypes;
+  }
+
+  public static void setEventDayTypes(
+      LinkedHashMap<String, String> eventDayTypes) {
+    AppContext.eventDayTypes = eventDayTypes;
   }
 
   private void requestDisricts() {
