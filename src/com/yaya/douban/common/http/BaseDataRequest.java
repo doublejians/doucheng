@@ -4,12 +4,36 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.zip.GZIPInputStream;
 
 import com.yaya.douban.common.utils.AppLog;
 
 public abstract class BaseDataRequest implements Runnable {
-  protected String url;
+  public static String[] REQUEST_METHOD = { "GET", "POST", "PUT", "DELETE" };
+
+  public static final String URL_DEFAULT = "https://api.douban.com";
+  public static final String PATH_LOCS_CITIES = "/v2/loc/list";
+  public static final String PATH_EVENT_LIST = "/v2/event/list";
+  public static final String PATH_LOCS_DISTRICTS = "/v2/loc/%1$s/districts";
+
+  public static final String PARAM_START = "start";
+  public static final String PARAM_COUNT = "count";
+  public static final String PARAM_LOC = "loc";
+  public static final String PARAM_TYPE = "type";
+  public static final String PARAM_DAY_TYPE = "day_type";
+  public static final String PARAM_LOC_DISTRICT = "district";
+
+  protected String url = URL_DEFAULT;
+  protected String path;
+  protected Map<String, String> values = new HashMap<String, String>();
+
+  protected int requestMethod = 0;// 请求方式
+  protected int start;// 起始元素
+  protected int count;// 返回结果的数量
+  protected BaseDataResponse response = new BaseDataResponse();
   private BaseDataParser parser;
   private NetworkCallBack callback;
 
@@ -17,16 +41,17 @@ public abstract class BaseDataRequest implements Runnable {
   public void run() {
 
     HttpURLConnection conn;
-    BaseDataResponse dr = new BaseDataResponse();
     try {
-      conn = (HttpURLConnection) new URL(url).openConnection();
+      String realUrl = buildRealUrl();
+      conn = (HttpURLConnection) new URL(realUrl).openConnection();
       conn.setConnectTimeout(10000);
 
-      conn.setRequestMethod("GET");
+      conn.setRequestMethod(REQUEST_METHOD[requestMethod]);
+      conn.setRequestProperty("Accept-Charset", "UTF-8");
       parser = createParser();
 
       int rsCode = conn.getResponseCode();
-      dr.setResultCode(rsCode);
+      response.setResultCode(rsCode);
       if (rsCode == 200) {
         int size = 0;
         StringBuffer data = new StringBuffer();
@@ -39,19 +64,36 @@ public abstract class BaseDataRequest implements Runnable {
         }
 
         AppLog.e("xxx", "data: " + data.toString());
-        dr = parser.parser(data.toString());
+        response = parser.parser(data.toString());
         if (callback != null) {
-          callback.onRequestCompleted(dr);
+          callback.onRequestCompleted(response);
         }
       }
     } catch (Exception e) {
       e.printStackTrace();
       if (callback != null) {
 
-        dr.setResultCode(-100);
-        callback.onRequestCompleted(dr);
+        response.setResultCode(-100);
+        callback.onRequestCompleted(response);
       }
     }
+  }
+
+  private String buildRealUrl() {
+    StringBuilder builder = new StringBuilder();
+    builder.append(url + (url.endsWith("/") ? "" : "/") + path);
+    if (values.isEmpty() || requestMethod != 0) {
+      return builder.toString();
+    }
+    if (requestMethod == 0) {
+      builder.append("?");
+      Set<String> keys = values.keySet();
+      for (String key : keys) {
+        builder.append(key + "=" + values.get(key) + "&");
+      }
+      return builder.substring(0, builder.length() - 1);
+    }
+    return builder.toString();
   }
 
   public void startRequest() {
@@ -67,5 +109,4 @@ public abstract class BaseDataRequest implements Runnable {
   public interface NetworkCallBack {
     public void onRequestCompleted(BaseDataResponse dr);
   }
-
 }

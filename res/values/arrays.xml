@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="tc_event_types">
+        <item>全部 all</item>
+        <item>音乐 music</item>
+        <item>电影 film</item>
+        <item>展览 exhibition</item>
+        <item>戏剧 drama</item>
+        <item>讲座 salon</item>
+        <item>聚会 party</item>
+        <item>运动 sports</item>
+        <item>旅行 travel</item>
+        <item>公益 commonweal</item>
+        <item>其他 others</item>
+    </string-array>
+    <string-array name="tc_event_day_type">
+        <item>全部 future</item>
+        <item>最近一周 week</item>
+        <item>今天 today</item>
+        <item>明天 tomorrow</item>
+        <item>周末 weekend</item>
+    </string-array>
+
+</resources>

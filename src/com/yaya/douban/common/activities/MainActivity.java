@@ -1,23 +1,30 @@
 package com.yaya.douban.common.activities;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.view.View.OnClickListener;
 
 import com.yaya.douban.R;
 import com.yaya.douban.common.http.BaseDataRequest.NetworkCallBack;
 import com.yaya.douban.common.http.BaseDataResponse;
 import com.yaya.douban.common.utils.AppLog;
+import com.yaya.douban.tongcheng.activities.LocsChooseActivity;
+import com.yaya.douban.tongcheng.activities.TCEventListActivity;
 import com.yaya.douban.tongcheng.requests.XSEventRequest;
 import com.yaya.douban.tongcheng.responses.XSEventResponse;
 import com.yaya.douban.tongcheng.types.XSEvent;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements OnClickListener {
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     setContentView(R.layout.activity_main);
     super.onCreate(savedInstanceState);
-    getEvetns();
+    // getEvetns();
+    findViewById(R.id.bt_start).setOnClickListener(this);
+    findViewById(R.id.bt_event_list).setOnClickListener(this);
   }
 
   public void getEvetns() {
@@ -43,6 +50,24 @@ public class MainActivity extends Activity {
       }
     });
     request.getAllXSEvent();
+  }
+
+  @Override
+  public void onClick(View v) {
+    switch (v.getId()) {
+    case R.id.bt_start: {
+      Intent intent = new Intent(MainActivity.this, LocsChooseActivity.class);
+      startActivity(intent);
+    }
+      break;
+    case R.id.bt_event_list: {
+      Intent intent = new Intent(MainActivity.this, TCEventListActivity.class);
+      startActivity(intent);
+    }
+      break;
+    default:
+      break;
+    }
   }
 
 }
