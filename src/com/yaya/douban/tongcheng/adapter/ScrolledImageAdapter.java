@@ -50,7 +50,7 @@ public class ScrolledImageAdapter {
     param = new LayoutParams(width, height);
     param.setMargins(padding, 0, padding, 0);
     param.gravity = Gravity.CENTER;
-    view.addView(layout, -2, -1);
+    view.addView(layout, -1, -1);
   }
 
   /**
@@ -77,6 +77,10 @@ public class ScrolledImageAdapter {
       }
       updateViews(false);
     }
+  }
+
+  public int getCount() {
+    return photos.size();
   }
 
   private void updateViews(boolean clearAll) {

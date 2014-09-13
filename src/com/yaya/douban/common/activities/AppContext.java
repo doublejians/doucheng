@@ -36,6 +36,7 @@ public class AppContext extends Application {
     super.onCreate();
     loadEventTypes();
     loadEventDayTypes();
+    @SuppressWarnings("deprecation")
     ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(
         getApplicationContext()).threadPriority(Thread.NORM_PRIORITY - 2)
         .denyCacheImageMultipleSizesInMemory()

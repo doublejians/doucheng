@@ -12,9 +12,11 @@ public class TCEventPhotoListRequest extends BaseDataRequest {
     return new TCEventPhotoParser();
   }
 
-  public void getCurrentEventPhotos() {
+  public void getCurrentEventPhotos(int start, int count) {
     String eventId = AppContext.getInstance().getCurrentEvent().getId();
     path = String.format(PATH_EVENT_PHOTOS, eventId);
+    values.put(PARAM_START, start + "");
+    values.put(PARAM_COUNT, count + "");
     startRequest();
   }
 }

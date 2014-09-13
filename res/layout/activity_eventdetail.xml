@@ -188,7 +188,7 @@
             android:layout_height="1dp"
             android:background="@color/gray" />
 
-        <HorizontalScrollView
+        <com.yaya.douban.common.widgets.ScrollViewCustom
             android:id="@+id/photos_container"
             android:layout_width="fill_parent"
             android:layout_height="150dp"

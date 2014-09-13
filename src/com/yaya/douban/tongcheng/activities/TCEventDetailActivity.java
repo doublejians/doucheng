@@ -5,9 +5,10 @@ import java.net.URISyntaxException;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.HorizontalScrollView;
+import android.view.View.OnTouchListener;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -16,6 +17,9 @@ import com.yaya.douban.R;
 import com.yaya.douban.common.activities.AppContext;
 import com.yaya.douban.common.http.BaseDataRequest.NetworkCallBack;
 import com.yaya.douban.common.http.BaseDataResponse;
+import com.yaya.douban.common.utils.AppLog;
+import com.yaya.douban.common.widgets.ScrollViewCustom;
+import com.yaya.douban.common.widgets.ScrollViewCustom.OnScrollStopListner;
 import com.yaya.douban.tongcheng.adapter.ScrolledImageAdapter;
 import com.yaya.douban.tongcheng.adapter.TCEventListAdapter;
 import com.yaya.douban.tongcheng.adapter.TCEventListAdapter.EventViewHolder;
@@ -29,8 +33,10 @@ public class TCEventDetailActivity extends TCBaseActivity implements
   private TCEvent event;
   private EventViewHolder holder;
   private TCEventPhotoListRequest request;
-  private HorizontalScrollView photosContainer;
+  private ScrollViewCustom photosContainer;
   private ScrolledImageAdapter adapter;
+  private int currentStart = 0;
+  private int totalphotos = 0;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +61,7 @@ public class TCEventDetailActivity extends TCBaseActivity implements
 
     descTv = (TextView) findViewById(R.id.event_desc);
     photoNumTv = (TextView) findViewById(R.id.event_photo_num);
-    photosContainer = (HorizontalScrollView) findViewById(R.id.photos_container);
+    photosContainer = (ScrollViewCustom) findViewById(R.id.photos_container);
     TCEventListAdapter.fillEventListViewHolder(holder, event);
     adapter = new ScrolledImageAdapter(this, photosContainer);
     descTv.setText(event.getContent());
@@ -66,6 +72,45 @@ public class TCEventDetailActivity extends TCBaseActivity implements
       @Override
       public void run() {
         requestAlbum();
+      }
+    });
+    photosContainer.setOnTouchListener(new OnTouchListener() {
+      @Override
+      public boolean onTouch(View v, MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_UP) {
+          photosContainer.startScrollerTask();
+        }
+        return false;
+      }
+    });
+    photosContainer.setOnScrollStopListner(new OnScrollStopListner() {
+
+      @Override
+      public void onScrollToRightEdge() {
+        AppLog.e("xxxScroll", "onScrollToRightEdge");
+        if (currentStart >= totalphotos) {
+          AppLog.e("xxxScroll", "all data is shown");
+          Toast.makeText(TCEventDetailActivity.this, "没有更多的图片了",
+              Toast.LENGTH_SHORT).show();
+        } else {
+          requestAlbum();
+          AppLog.e("xxxScroll", "request data");
+        }
+      }
+
+      @Override
+      public void onScrollToMiddle() {
+
+      }
+
+      @Override
+      public void onScrollToLeftEdge() {
+
+      }
+
+      @Override
+      public void onScrollStoped() {
+
       }
     });
   }
@@ -79,16 +124,19 @@ public class TCEventDetailActivity extends TCBaseActivity implements
       public void onRequestCompleted(BaseDataResponse dr) {
         if (dr instanceof TCEventPhotoListResponse) {
           if (dr.getResultCode() == 200) {
-            adapter.setData(((TCEventPhotoListResponse) dr).getData());
-            String txt = "活动图片(%1$s)";
-            photoNumTv.setText(String.format(txt, dr.getTotal()));
+            adapter.appendData(((TCEventPhotoListResponse) dr).getData());
+            String txt = "活动图片(%1$d)";
+            totalphotos = dr.getTotal();
+            currentStart += adapter.getCount();
+            photoNumTv.setText(String.format(txt, totalphotos));
           }
         }
       }
     });
-    request.getCurrentEventPhotos();
+    request.getCurrentEventPhotos(currentStart, 20);
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public void onClick(View v) {
     // 如果本机安装了百度地图，直接打开应用并定位到对应的地点，否则给出提示，后期判定各种地图吧。。。
