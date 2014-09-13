@@ -79,8 +79,7 @@ public class LocsChooseActivity extends TCBaseActivity {
       @Override
       public void onItemClick(AdapterView<?> parent, View view, int position,
           long id) {
-        AppContext.getInstance()
-            .setCurrentLoc((Loc) adapter.getItem(position));
+        AppContext.getInstance().setCurrentLoc((Loc) adapter.getItem(position));
         setResult(RESULT_OK);
         finish();
       }

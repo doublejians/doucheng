@@ -45,6 +45,9 @@ public abstract class BaseDataRequest implements Runnable {
     HttpURLConnection conn;
     try {
       String realUrl = buildRealUrl();
+      realUrl = realUrl + (realUrl.contains("?") ? "&" : "?")
+          + "apikey=0339b495d888705009ad1dc1899950f0";
+
       AppLog.e("xxxUrl", "realUrl--->" + realUrl);
       conn = (HttpURLConnection) new URL(realUrl).openConnection();
       conn.setConnectTimeout(10000);

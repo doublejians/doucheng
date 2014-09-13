@@ -3,9 +3,12 @@ package com.yaya.douban.tongcheng.activities;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,6 +24,7 @@ import com.yaya.douban.tongcheng.adapter.TCEventListAdapter;
 import com.yaya.douban.tongcheng.requests.TCEventListRequest;
 import com.yaya.douban.tongcheng.responses.TCEventListResponse;
 import com.yaya.douban.tongcheng.types.Loc;
+import com.yaya.douban.tongcheng.types.TCEvent;
 
 public class TCEventListActivity extends TCBaseActivity implements
     OnClickListener {
@@ -47,6 +51,23 @@ public class TCEventListActivity extends TCBaseActivity implements
 
     adapter = new TCEventListAdapter(this);
     eventList.setAdapter(adapter);
+    eventList.setOnItemClickListener(new OnItemClickListener() {
+
+      @Override
+      public void onItemClick(AdapterView<?> parent, View view, int position,
+          long id) {
+        if (position > adapter.getCount() - 1) {
+          return;
+        }
+        TCEvent event = (TCEvent) adapter.getItem(position);
+        AppContext.getInstance().setCurrentEvent(event);
+        Intent intent = new Intent();
+        intent.setClass(TCEventListActivity.this, TCEventDetailActivity.class);
+        TCEventListActivity.this.startActivity(intent);
+        AppLog.e("xxxxxxx",
+            "onItemCLick---->" + position + "    " + event.getTitle());
+      }
+    });
     requestEvents();
   }
 

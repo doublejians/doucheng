@@ -21,20 +21,12 @@ import com.yaya.douban.tongcheng.types.TCEvent;
 
 public class TCEventListAdapter extends BaseAdapter {
   private Context context;
-  private DisplayImageOptions options;
-  private ImageLoader imgLoader;
+  private static DisplayImageOptions options;
 
   private ArrayList<TCEvent> datas = new ArrayList<TCEvent>();
 
   public TCEventListAdapter(Context tcontext) {
     context = tcontext;
-    options = new DisplayImageOptions.Builder()
-        .showStubImage(R.drawable.post_photo_default)
-        .showImageForEmptyUri(R.drawable.post_photo_default)
-        .showImageOnFail(R.drawable.post_photo_default).cacheInMemory(true)
-        .cacheOnDisc(true).bitmapConfig(Bitmap.Config.RGB_565) // 设置图片的解码类型
-        .build();
-    imgLoader = ImageLoader.getInstance();
   }
 
   public void setData(ArrayList<TCEvent> tdatas) {
@@ -63,10 +55,11 @@ public class TCEventListAdapter extends BaseAdapter {
 
   @Override
   public View getView(int position, View convertView, ViewGroup parent) {
-    ViewHolder holder;
+    EventViewHolder holder;
     TCEvent event = datas.get(position);
-    if (convertView == null || !(convertView.getTag() instanceof ViewHolder)) {
-      holder = new ViewHolder();
+    if (convertView == null
+        || !(convertView.getTag() instanceof EventViewHolder)) {
+      holder = new EventViewHolder();
       convertView = LayoutInflater.from(context).inflate(
           R.layout.item_for_eventlist, parent, false);
       holder.titleTv = (TextView) convertView.findViewById(R.id.event_title);
@@ -78,7 +71,6 @@ public class TCEventListAdapter extends BaseAdapter {
 
       holder.endTv = (TextView) convertView.findViewById(R.id.event_endtxt);
 
-      // holder.feeTv = (TextView) convertView.findViewById(R.id.event_fee);
       holder.wisherTv = (TextView) convertView
           .findViewById(R.id.event_wishercount);
       holder.ownerTv = (TextView) convertView.findViewById(R.id.event_owner);
@@ -88,9 +80,23 @@ public class TCEventListAdapter extends BaseAdapter {
       holder.previewIv = (ImageView) convertView
           .findViewById(R.id.event_preimg);
     } else {
-      holder = (ViewHolder) convertView.getTag();
+      holder = (EventViewHolder) convertView.getTag();
     }
+    fillEventListViewHolder(holder, event);
+    convertView.setTag(holder);
+    return convertView;
+  }
 
+  public static void fillEventListViewHolder(EventViewHolder holder,
+      TCEvent event) {
+    if (options == null) {
+      options = new DisplayImageOptions.Builder()
+          .showStubImage(R.drawable.post_photo_default)
+          .showImageForEmptyUri(R.drawable.post_photo_default)
+          .showImageOnFail(R.drawable.post_photo_default).cacheInMemory(true)
+          .cacheOnDisc(true).bitmapConfig(Bitmap.Config.RGB_565) // 设置图片的解码类型
+          .build();
+    }
     holder.titleTv.setText(event.getTitle());
     String startStr = Tools.getStartEndStr(event.getBegin_time());
     String endStr = Tools.getStartEndStr(event.getEnd_time());
@@ -115,16 +121,15 @@ public class TCEventListAdapter extends BaseAdapter {
         + event.getWisher_count() + "</font></big>感兴趣"));
     holder.participantTv.setText(Html.fromHtml("<big><font color='#ba142b'>"
         + event.getParticipant_count() + "</font></big>参加"));
-    imgLoader.displayImage(event.getImage(), holder.previewIv, options);
+    ImageLoader.getInstance().displayImage(event.getImage(), holder.previewIv,
+        options);
     // boolean isFree = !event.isHas_ticket();
     // holder.feeTv.setText(Html
     // .fromHtml(isFree ? "<big><font color='#ba142b'>免费</font><big>" : "收费"));
     holder.ownerTv.setText("主办方：" + event.getOwner().getName());
-    convertView.setTag(holder);
-    return convertView;
   }
 
-  private String getDayStrFromToday(String timeStr) {
+  private static String getDayStrFromToday(String timeStr) {
     Date endDate = Tools.getDateByStr(timeStr);
     Date today = new Date(System.currentTimeMillis());
     int distance = Tools.daysOfTwo(today, endDate);
@@ -138,9 +143,9 @@ public class TCEventListAdapter extends BaseAdapter {
     return builder.toString();
   }
 
-  class ViewHolder {
-    TextView titleTv, dateTv, addressTv, typeTv, endTv, wisherTv,
+  public static class EventViewHolder {
+    public TextView titleTv, dateTv, addressTv, typeTv, endTv, wisherTv,
         participantTv, ownerTv;
-    ImageView previewIv;
+    public ImageView previewIv;
   }
 }

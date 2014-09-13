@@ -6,6 +6,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+import android.content.Context;
+
 /**
  * 各种工具方法
  * 
@@ -27,6 +29,19 @@ public class Tools {
       e.printStackTrace();
     }
     return result;
+  }
+
+  public static int getPixelByDip(Context context, int dip) {
+    return (int) (context.getResources().getDisplayMetrics().density * dip + 0.5f);
+  }
+
+  public static int getPixelByDip(Context context, float dip) {
+    return (int) (context.getResources().getDisplayMetrics().density * dip + 0.5f);
+  }
+
+  // 通过pixel获得字体大小的sp值
+  public static int getTextSpByPixel(Context context, int pixel) {
+    return (int) (pixel / context.getResources().getDisplayMetrics().scaledDensity);
   }
 
   /**
