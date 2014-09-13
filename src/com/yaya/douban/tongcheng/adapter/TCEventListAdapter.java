@@ -87,6 +87,12 @@ public class TCEventListAdapter extends BaseAdapter {
     return convertView;
   }
 
+  /**
+   * 为了填充活动详情更省事，直接写出一个方法
+   * 
+   * @param holder
+   * @param event
+   */
   public static void fillEventListViewHolder(EventViewHolder holder,
       TCEvent event) {
     if (options == null) {
@@ -121,6 +127,7 @@ public class TCEventListAdapter extends BaseAdapter {
         + event.getWisher_count() + "</font></big>感兴趣"));
     holder.participantTv.setText(Html.fromHtml("<big><font color='#ba142b'>"
         + event.getParticipant_count() + "</font></big>参加"));
+    // 自己管理加载以及回调
     ImageLoader.getInstance().displayImage(event.getImage(), holder.previewIv,
         options);
     // boolean isFree = !event.isHas_ticket();

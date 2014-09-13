@@ -15,29 +15,31 @@ public abstract class BaseDataRequest implements Runnable {
   public static String[] REQUEST_METHOD = { "GET", "POST", "PUT", "DELETE" };
 
   public static final String URL_DEFAULT = "https://api.douban.com";
-  public static final String PATH_LOCS_CITIES = "/v2/loc/list";
-  public static final String PATH_LOCS_DISTRICTS = "/v2/loc/%1$s/districts";
-  public static final String PATH_EVENT_DETAIL = "/v2/event/%1$s";
-  public static final String PATH_EVENT_LIST = "/v2/event/list";
-  public static final String PATH_EVENT_PHOTOS = "/v2/event/%1$s/photos";
+  // 各种路径
+  public static final String PATH_LOCS_CITIES = "/v2/loc/list"; // 城市列表
+  public static final String PATH_LOCS_DISTRICTS = "/v2/loc/%1$s/districts";// 城市的区
+  public static final String PATH_EVENT_DETAIL = "/v2/event/%1$s";// 活动详细信息
+  public static final String PATH_EVENT_LIST = "/v2/event/list";// 活动列表
+  public static final String PATH_EVENT_PHOTOS = "/v2/event/%1$s/photos";// 活动图片
 
-  public static final String PARAM_START = "start";
-  public static final String PARAM_COUNT = "count";
-  public static final String PARAM_LOC = "loc";
-  public static final String PARAM_TYPE = "type";
-  public static final String PARAM_DAY_TYPE = "day_type";
-  public static final String PARAM_LOC_DISTRICT = "district";
+  // 请求的参数们。。。
+  public static final String PARAM_START = "start"; // 开始元素
+  public static final String PARAM_COUNT = "count"; // 想要请求元素个数
+  public static final String PARAM_LOC = "loc"; // 城市
+  public static final String PARAM_TYPE = "type"; // 活动类型
+  public static final String PARAM_DAY_TYPE = "day_type"; // 时间类型
+  public static final String PARAM_LOC_DISTRICT = "district"; // 区
 
   protected String url = URL_DEFAULT;
   protected String path;
-  protected Map<String, String> values = new HashMap<String, String>();
+  protected Map<String, String> values = new HashMap<String, String>();// 各种参数集合
 
   protected int requestMethod = 0;// 请求方式
   protected int start;// 起始元素
   protected int count;// 返回结果的数量
   protected BaseDataResponse response = new BaseDataResponse();
-  private BaseDataParser parser;
-  private NetworkCallBack callback;
+  private BaseDataParser parser;// 解析器
+  private NetworkCallBack callback;// 数据请求后的回调
 
   @Override
   public void run() {
@@ -78,7 +80,6 @@ public abstract class BaseDataRequest implements Runnable {
     } catch (Exception e) {
       e.printStackTrace();
       if (callback != null) {
-
         response.setResultCode(-100);
         callback.onRequestCompleted(response);
       }

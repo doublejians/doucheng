@@ -22,14 +22,14 @@ import com.yaya.douban.tongcheng.types.TCEvent;
 public class AppContext extends Application {
   public final static String INTENT_DISTICTS_WEB_RESULT = "com.doutongcheng.change.disticts";
 
-  public static LinkedHashMap<String, String> eventTypes = new LinkedHashMap<String, String>();
-  public static LinkedHashMap<String, String> eventDayTypes = new LinkedHashMap<String, String>();
+  public static LinkedHashMap<String, String> eventTypes = new LinkedHashMap<String, String>();// 活动类型
+  public static LinkedHashMap<String, String> eventDayTypes = new LinkedHashMap<String, String>();// 活动时间类型
 
   private static AppContext instance = new AppContext();
 
-  private Loc currentLoc;
-  private TCEvent currentEvent;
-  private LinkedHashMap<String, ArrayList<Loc>> disticts = new LinkedHashMap<String, ArrayList<Loc>>();
+  private Loc currentLoc;// 当前城市
+  private TCEvent currentEvent;// 正在查看或者操作的活动
+  private LinkedHashMap<String, ArrayList<Loc>> disticts = new LinkedHashMap<String, ArrayList<Loc>>();// 缓存所有查看过的城市的区
 
   @Override
   public void onCreate() {
@@ -125,6 +125,7 @@ public class AppContext extends Application {
     this.currentEvent = currentEvent;
   }
 
+  // 请求城市对应的区，现在请求的时机很有问题，之后修改。
   private void requestDisricts() {
     TCLocListRequest request = new TCLocListRequest();
     request.registNetworkCallback(new NetworkCallBack() {

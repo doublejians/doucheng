@@ -19,12 +19,17 @@ import com.yaya.douban.common.utils.Tools;
 import com.yaya.douban.tongcheng.types.Photo;
 import com.yaya.douban.tongcheng.types.json.AlbumPhotoJsonType;
 
+/**
+ * 填充图片到横向可活动控件
+ * 
+ * @author doublejian
+ * 
+ */
 public class ScrolledImageAdapter {
-  private AlbumPhotoJsonType data;
   private ArrayList<Photo> photos = new ArrayList<Photo>();
   private Context context;
   private static DisplayImageOptions options;
-  private LinearLayout layout;
+  private LinearLayout layout;// 图片容器
   private LayoutParams param;
 
   public ScrolledImageAdapter(Context tcontext, HorizontalScrollView view) {
@@ -48,14 +53,23 @@ public class ScrolledImageAdapter {
     view.addView(layout, -2, -1);
   }
 
+  /**
+   * 设置数据
+   * 
+   * @param tdata
+   */
   public void setData(AlbumPhotoJsonType tdata) {
-    data = tdata;
     for (Photo photo : tdata.getPhotos()) {
       photos.add(photo);
     }
     updateViews(true);
   }
 
+  /**
+   * 向滑动空间控件添加数据，用于向右滑动加载更多时
+   * 
+   * @param tdata
+   */
   public void appendData(AlbumPhotoJsonType tdata) {
     if (tdata != null) {
       for (Photo photo : tdata.getPhotos()) {
@@ -81,6 +95,7 @@ public class ScrolledImageAdapter {
       ImageView iv = new ImageView(context);
       iv.setScaleType(ScaleType.CENTER_CROP);
       layout.addView(iv, param);
+      // 自动加载
       ImageLoader.getInstance().displayImage(photo.getImage(), iv, options);
     }
   }

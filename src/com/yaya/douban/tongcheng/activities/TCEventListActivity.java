@@ -28,13 +28,13 @@ import com.yaya.douban.tongcheng.types.TCEvent;
 
 public class TCEventListActivity extends TCBaseActivity implements
     OnClickListener {
-  private TextView typeBt, dayTypeBt, locTypeBt;
-  private ListView eventList;
-  private TCEventListAdapter adapter;
-  private TCEventListRequest request;
-  private int currentStart = 0;
+  private TextView typeBt, dayTypeBt, locTypeBt; // 三个筛选按钮
+  private ListView eventList;// 活动列表
+  private TCEventListAdapter adapter;// 活动适配器
+  private TCEventListRequest request;// 请求
+  private int currentStart = 0;// 当前起始元素
   private String type = "all", daytype = "future", loc = "118159",
-      district = "";
+      district = "";// 对应请求的几个参数 活动类型、时间类型、城市ID、区ID
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +59,7 @@ public class TCEventListActivity extends TCBaseActivity implements
         if (position > adapter.getCount() - 1) {
           return;
         }
+        // 跳转到活动详情页，将选中的活动对象带到详情页
         TCEvent event = (TCEvent) adapter.getItem(position);
         AppContext.getInstance().setCurrentEvent(event);
         Intent intent = new Intent();

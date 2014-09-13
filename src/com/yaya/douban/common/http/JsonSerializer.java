@@ -5,6 +5,12 @@ import java.util.Collection;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 
+/**
+ * json解析工具类
+ * 
+ * @author doublejian
+ * 
+ */
 public class JsonSerializer {
   private static JsonSerializer instance = new JsonSerializer();
 

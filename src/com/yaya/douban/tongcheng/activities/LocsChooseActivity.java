@@ -61,6 +61,7 @@ public class LocsChooseActivity extends TCBaseActivity {
       public void onScrollStateChanged(AbsListView view, int scrollState) {
         switch (scrollState) {
         case OnScrollListener.SCROLL_STATE_IDLE:
+          // 列表拉到最下方，继续请求更多城市，进度条啥的以后再添加吧
           if (citylist.getLastVisiblePosition() == (citylist.getCount() - 1)) {
             AppLog.e("xxxxScroll", "------last position--------");
             requestCities();
@@ -74,11 +75,13 @@ public class LocsChooseActivity extends TCBaseActivity {
           int visibleItemCount, int totalItemCount) {
       }
     });
+    // 注册点击事件
     citylist.setOnItemClickListener(new OnItemClickListener() {
 
       @Override
       public void onItemClick(AdapterView<?> parent, View view, int position,
           long id) {
+        // 选中城市后 将城市存储到全局Appcontext里面并关闭Activity
         AppContext.getInstance().setCurrentLoc((Loc) adapter.getItem(position));
         setResult(RESULT_OK);
         finish();

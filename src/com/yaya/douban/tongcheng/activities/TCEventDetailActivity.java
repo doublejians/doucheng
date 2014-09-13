@@ -70,6 +70,7 @@ public class TCEventDetailActivity extends TCBaseActivity implements
     });
   }
 
+  // 请求图片信息
   private void requestAlbum() {
     request = new TCEventPhotoListRequest();
     request.registNetworkCallback(new NetworkCallBack() {
@@ -90,6 +91,7 @@ public class TCEventDetailActivity extends TCBaseActivity implements
 
   @Override
   public void onClick(View v) {
+    // 如果本机安装了百度地图，直接打开应用并定位到对应的地点，否则给出提示，后期判定各种地图吧。。。
     try {
       Intent intent = Intent
           .getIntent("intent://map/marker?location="
