@@ -38,6 +38,14 @@ public class TCEventListAdapter extends BaseAdapter {
     notifyDataSetChanged();
   }
 
+  public void appendData(ArrayList<TCEvent> tdatas) {
+    if (tdatas == null) {
+      return;
+    }
+    datas.addAll(tdatas);
+    notifyDataSetChanged();
+  }
+
   @Override
   public int getCount() {
     return datas.size();

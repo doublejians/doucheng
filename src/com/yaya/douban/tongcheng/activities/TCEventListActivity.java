@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
@@ -69,6 +71,26 @@ public class TCEventListActivity extends TCBaseActivity implements
             "onItemCLick---->" + position + "    " + event.getTitle());
       }
     });
+    eventList.setOnScrollListener(new OnScrollListener() {
+
+      @Override
+      public void onScrollStateChanged(AbsListView view, int scrollState) {
+        switch (scrollState) {
+        case OnScrollListener.SCROLL_STATE_IDLE:
+          // 列表拉到最下方，继续请求更多城市，进度条啥的以后再添加吧
+          if (eventList.getLastVisiblePosition() == (eventList.getCount() - 1)) {
+            AppLog.e("xxxxScroll", "------last position--------");
+            requestEvents();
+          }
+          break;
+        }
+      }
+
+      @Override
+      public void onScroll(AbsListView view, int firstVisibleItem,
+          int visibleItemCount, int totalItemCount) {
+      }
+    });
     requestEvents();
   }
 
@@ -81,7 +103,7 @@ public class TCEventListActivity extends TCBaseActivity implements
         if (dr instanceof TCEventListResponse) {
           if (dr.getResultCode() == 200) {
             TCEventListResponse result = (TCEventListResponse) dr;
-            adapter.setData(result.getData());
+            adapter.appendData(result.getData());
             Toast.makeText(TCEventListActivity.this,
                 "共为您找到" + result.getTotal() + "个活动", Toast.LENGTH_SHORT).show();
             currentStart += result.getData().size();
