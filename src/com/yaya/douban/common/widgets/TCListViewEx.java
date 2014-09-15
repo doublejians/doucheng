@@ -18,7 +18,6 @@ import com.yaya.douban.R;
  */
 public class TCListViewEx extends ListView {
   private Context context;
-  private View emptyView;// 结果为空的时候显示
   private View loadingView;// 加载时底部显示
   private ITCListViewCallBack listener;
 
@@ -27,6 +26,7 @@ public class TCListViewEx extends ListView {
     context = tcontext;
     loadingView = LayoutInflater.from(tcontext).inflate(
         R.layout.footer_for_listview_loading, this, false);
+
     loadingView.setVisibility(View.GONE);
     addFooterView(loadingView);
     setOnScrollListener(new OnScrollListener() {
@@ -74,18 +74,13 @@ public class TCListViewEx extends ListView {
   }
 
   public void hideFooterProgress() {
-    if (indexOfChild(loadingView) < 0) {
+    if (indexOfChild(loadingView) > 0) {
       removeFooterView(loadingView);
     }
   }
 
   public void registListCallBack(ITCListViewCallBack lisen) {
     listener = lisen;
-  }
-
-  public void setupEmptyView(View empty) {
-    emptyView = empty;
-    setEmptyView(emptyView);
   }
 
   public interface ITCListViewCallBack {

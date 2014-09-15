@@ -8,6 +8,7 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.yaya.douban.R;
 import com.yaya.douban.common.activities.AppContext;
@@ -55,7 +56,6 @@ public class LocsChooseActivity extends TCBaseActivity implements
       }
     });
     adapter = new TCLocsAdapter(this);
-
     citylist.registListCallBack(this);
     citylist.setAdapter(adapter);
     citylist.setLoadingViewBgColor(getResources().getColor(R.color.white));
@@ -67,8 +67,8 @@ public class LocsChooseActivity extends TCBaseActivity implements
     request.registNetworkCallback(new NetworkCallBack() {
       @Override
       public void onRequestCompleted(BaseDataResponse dr) {
+        citylist.hideFooterProgress();
         if (dr instanceof TCLocListResponse) {
-          citylist.hideFooterProgress();
           TCLocListResponse response = (TCLocListResponse) dr;
           ArrayList<Loc> datas = new ArrayList<Loc>();
           for (Loc city : response.getData().getLocs()) {
@@ -78,6 +78,8 @@ public class LocsChooseActivity extends TCBaseActivity implements
           adapter.appendData(datas);
         } else {
           AppLog.e("xxxx", "null or error");
+          Toast.makeText(LocsChooseActivity.this, "发生错误", Toast.LENGTH_SHORT)
+              .show();
         }
       }
     });
@@ -86,8 +88,8 @@ public class LocsChooseActivity extends TCBaseActivity implements
 
   @Override
   public void onLoadMore() {
-    requestCities();
     citylist.showFooterProgress();
+    requestCities();
   }
 
   @Override

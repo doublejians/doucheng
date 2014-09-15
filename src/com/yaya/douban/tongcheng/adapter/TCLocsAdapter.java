@@ -20,17 +20,8 @@ public class TCLocsAdapter extends BaseAdapter {
     context = tcontext;
   }
 
-  public void setData(ArrayList<Loc> cdatas) {
-    if (cdatas == null || cdatas.size() == 0) {
-      return;
-    }
-    datas.clear();
-    datas.addAll(cdatas);
-    notifyDataSetChanged();
-  }
-
   public void appendData(ArrayList<Loc> cdatas) {
-    if (cdatas == null || cdatas.size() == 0) {
+    if (cdatas == null) {
       return;
     }
     datas.addAll(cdatas);

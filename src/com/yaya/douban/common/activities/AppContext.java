@@ -24,7 +24,7 @@ public class AppContext extends Application {
 
   private static AppContext instance = new AppContext();
 
-  private boolean isDistictsRequesting = false;
+  private boolean distictsRequesting = false;
   private Loc currentLoc;// 当前城市
   private TCEvent currentEvent;// 正在查看或者操作的活动
   private LinkedHashMap<String, ArrayList<Loc>> disticts = new LinkedHashMap<String, ArrayList<Loc>>();// 缓存所有查看过的城市的区
@@ -110,12 +110,20 @@ public class AppContext extends Application {
     this.currentEvent = currentEvent;
   }
 
-  // 请求城市对应的区，现在请求的时机很有问题，之后修改。
+  public boolean isDistictsRequesting() {
+    return distictsRequesting;
+  }
+
+  public void setDistictsRequesting(boolean distictsRequesting) {
+    this.distictsRequesting = distictsRequesting;
+  }
+
+  // 请求城市对应的区
   public void requestDisricts() {
-    if (isDistictsRequesting) {
+    if (distictsRequesting) {
       return;
     }
-    isDistictsRequesting = true;
+    distictsRequesting = true;
     TCLocListRequest request = new TCLocListRequest();
     request.registNetworkCallback(new NetworkCallBack() {
       @Override
@@ -133,7 +141,7 @@ public class AppContext extends Application {
             broadcastDistictsChange();
           }
         }
-        isDistictsRequesting = false;
+        distictsRequesting = false;
       }
     });
     request.getDistricts(currentLoc.getId(), 0, 30);

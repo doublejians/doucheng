@@ -22,26 +22,28 @@ import com.yaya.douban.common.utils.AppLog;
  * 
  */
 public class TCMenuPopup {
-  private PopupWindow popwindow;
-  private TextView anchorView;
-  private ListView listview;
-  private ArrayAdapter<String> adapter;
-  private IMenuItemCallback callback;
+  private Context context;
+  protected PopupWindow popwindow;
+  protected TextView anchorView;
+  protected View loadingView;
+  protected ListView listview;
+  protected ArrayAdapter<String> adapter;
+  protected IMenuItemCallback callback;
+  private LayoutInflater inflater;
 
-  public TCMenuPopup(Context context, TextView anchor,
-      ArrayList<String> strsToShow, IMenuItemCallback tcallback) {
+  public TCMenuPopup(Context tcontext, TextView anchor,
+      IMenuItemCallback tcallback) {
+    context = tcontext;
     callback = tcallback;
     anchorView = anchor;
+    inflater = LayoutInflater.from(context);
     popwindow = new PopupWindow(context);
-    View coreView = LayoutInflater.from(context).inflate(
-        R.layout.dropdown_list_layout, null);
+    View coreView = inflater.inflate(R.layout.dropdown_list_layout, null);
     listview = (ListView) coreView.findViewById(R.id.menulist);
-    adapter = new ArrayAdapter<String>(context,
-        android.R.layout.simple_list_item_1, android.R.id.text1, strsToShow);
-    listview.setAdapter(adapter);
+    loadingView = coreView.findViewById(R.id.loading);
     listview.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+    listview.setBackgroundResource(R.drawable.shape_menu_bg);// (context.getResources().getColor(R.color.white));
     listview.setOnItemClickListener(new OnItemClickListener() {
-
       @Override
       public void onItemClick(AdapterView<?> parent, View view, int position,
           long id) {
@@ -50,15 +52,37 @@ public class TCMenuPopup {
         AppLog.e("xxxxLoc", "onItemClick  " + position);
       }
     });
+    listview.setVisibility(View.INVISIBLE);
+    loadingView.setVisibility(View.VISIBLE);
     popwindow.setWidth(anchor.getWidth());
-    popwindow.setHeight(-2);
+    popwindow.setHeight(anchor.getHeight());
+    popwindow.setBackgroundDrawable(context.getResources().getDrawable(
+        R.drawable.shape_menu_bg));
     popwindow.setContentView(coreView);
+  }
+
+  public void setShownStrs(ArrayList<String> strsToShow) {
+    adapter = new ArrayAdapter<String>(context, R.layout.item_for_tcmenu,
+        R.id.menu_text, strsToShow);
+    listview.setAdapter(adapter);
+    listview.setVisibility(View.VISIBLE);
+    loadingView.setVisibility(View.GONE);
+    popwindow.setWidth(anchorView.getWidth());
+    popwindow.setHeight(anchorView.getHeight() * adapter.getCount());
   }
 
   public void showAsDropDown() {
     popwindow.setOutsideTouchable(true);
     popwindow.setFocusable(true);
     popwindow.showAsDropDown(anchorView);
+  }
+
+  public boolean isPopShown() {
+    return popwindow.isShowing();
+  }
+
+  public void dismissPop() {
+    popwindow.dismiss();
   }
 
   public interface IMenuItemCallback {

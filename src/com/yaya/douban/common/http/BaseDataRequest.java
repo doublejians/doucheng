@@ -9,6 +9,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.zip.GZIPInputStream;
 
+import android.os.Handler;
+import android.os.Message;
+
 import com.yaya.douban.common.utils.AppLog;
 
 public abstract class BaseDataRequest implements Runnable {
@@ -30,6 +33,8 @@ public abstract class BaseDataRequest implements Runnable {
   public static final String PARAM_DAY_TYPE = "day_type"; // 时间类型
   public static final String PARAM_LOC_DISTRICT = "district"; // 区
 
+  private static final int MESSAGE_REQUEST_COMPLETE = 1;
+
   protected String url = URL_DEFAULT;
   protected String path;
   protected Map<String, String> values = new HashMap<String, String>();// 各种参数集合
@@ -40,6 +45,21 @@ public abstract class BaseDataRequest implements Runnable {
   protected BaseDataResponse response = new BaseDataResponse();
   private BaseDataParser parser;// 解析器
   private NetworkCallBack callback;// 数据请求后的回调
+  private Handler handler;
+
+  public BaseDataRequest() {
+    handler = new Handler() {
+      @Override
+      public void handleMessage(Message msg) {
+        super.handleMessage(msg);
+        if (msg.what == MESSAGE_REQUEST_COMPLETE) {
+          if (callback != null) {
+            callback.onRequestCompleted(response);
+          }
+        }
+      }
+    };
+  }
 
   @Override
   public void run() {
@@ -73,9 +93,6 @@ public abstract class BaseDataRequest implements Runnable {
 
         AppLog.e("xxx", "data: " + data.toString());
         response = parser.parser(data.toString());
-        if (callback != null) {
-          callback.onRequestCompleted(response);
-        }
       }
     } catch (Exception e) {
       e.printStackTrace();
@@ -84,6 +101,9 @@ public abstract class BaseDataRequest implements Runnable {
         callback.onRequestCompleted(response);
       }
     }
+    Message msg = handler.obtainMessage();
+    msg.what = MESSAGE_REQUEST_COMPLETE;
+    msg.sendToTarget();
   }
 
   private String buildRealUrl() {
@@ -105,13 +125,19 @@ public abstract class BaseDataRequest implements Runnable {
   }
 
   public void startRequest() {
-    new Thread(this).run();
+    new Thread(this).start();
   }
 
   protected abstract BaseDataParser createParser();
 
   public void registNetworkCallback(NetworkCallBack nc) {
     callback = nc;
+  }
+
+  public static void unregistNetworkCallback(BaseDataRequest rq) {
+    if (rq != null) {
+      rq.registNetworkCallback(null);
+    }
   }
 
   public interface NetworkCallBack {
