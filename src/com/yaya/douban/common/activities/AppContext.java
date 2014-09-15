@@ -22,14 +22,14 @@ import com.yaya.douban.tongcheng.types.TCEvent;
 public class AppContext extends Application {
   public final static String INTENT_DISTICTS_WEB_RESULT = "com.doutongcheng.change.disticts";
 
-  public static LinkedHashMap<String, String> eventTypes = new LinkedHashMap<String, String>();// 活动类型
-  public static LinkedHashMap<String, String> eventDayTypes = new LinkedHashMap<String, String>();// 活动时间类型
-
   private static AppContext instance = new AppContext();
 
+  private boolean isDistictsRequesting = false;
   private Loc currentLoc;// 当前城市
   private TCEvent currentEvent;// 正在查看或者操作的活动
   private LinkedHashMap<String, ArrayList<Loc>> disticts = new LinkedHashMap<String, ArrayList<Loc>>();// 缓存所有查看过的城市的区
+  private static LinkedHashMap<String, String> eventTypes = new LinkedHashMap<String, String>();// 活动类型
+  private static LinkedHashMap<String, String> eventDayTypes = new LinkedHashMap<String, String>();// 活动时间类型
 
   @Override
   public void onCreate() {
@@ -74,26 +74,11 @@ public class AppContext extends Application {
   }
 
   public void setCurrentLoc(Loc currentLoc) {
-    boolean needRequest = false;
-    if (this.currentLoc == null) {
-      needRequest = true;
-    } else if (!this.currentLoc.equals(currentLoc)
-        && !disticts.containsKey(currentLoc.getName())) {
-      needRequest = true;
-    }
     this.currentLoc = currentLoc;
-    if (needRequest) {
-      requestDisricts();
-    }
   }
 
   public ArrayList<Loc> getDistricts(String key) {
-    if (disticts.containsKey(key)) {
-      return disticts.get(key);
-    } else {
-      requestDisricts();
-      return null;
-    }
+    return disticts.get(key);
   }
 
   public ArrayList<Loc> getDistricts() {
@@ -101,7 +86,7 @@ public class AppContext extends Application {
     return getDistricts(key);
   }
 
-  public static LinkedHashMap<String, String> getEventTypes() {
+  public LinkedHashMap<String, String> getEventTypes() {
     return eventTypes;
   }
 
@@ -109,12 +94,11 @@ public class AppContext extends Application {
     AppContext.eventTypes = eventTypes;
   }
 
-  public static LinkedHashMap<String, String> getEventDayTypes() {
+  public LinkedHashMap<String, String> getEventDayTypes() {
     return eventDayTypes;
   }
 
-  public static void setEventDayTypes(
-      LinkedHashMap<String, String> eventDayTypes) {
+  public void setEventDayTypes(LinkedHashMap<String, String> eventDayTypes) {
     AppContext.eventDayTypes = eventDayTypes;
   }
 
@@ -127,7 +111,11 @@ public class AppContext extends Application {
   }
 
   // 请求城市对应的区，现在请求的时机很有问题，之后修改。
-  private void requestDisricts() {
+  public void requestDisricts() {
+    if (isDistictsRequesting) {
+      return;
+    }
+    isDistictsRequesting = true;
     TCLocListRequest request = new TCLocListRequest();
     request.registNetworkCallback(new NetworkCallBack() {
       @Override
@@ -145,6 +133,7 @@ public class AppContext extends Application {
             broadcastDistictsChange();
           }
         }
+        isDistictsRequesting = false;
       }
     });
     request.getDistricts(currentLoc.getId(), 0, 30);

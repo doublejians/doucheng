@@ -6,28 +6,27 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
-import android.widget.AbsListView;
-import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
-import android.widget.ListView;
 
 import com.yaya.douban.R;
 import com.yaya.douban.common.activities.AppContext;
 import com.yaya.douban.common.http.BaseDataRequest.NetworkCallBack;
 import com.yaya.douban.common.http.BaseDataResponse;
 import com.yaya.douban.common.utils.AppLog;
+import com.yaya.douban.common.widgets.TCListViewEx;
+import com.yaya.douban.common.widgets.TCListViewEx.ITCListViewCallBack;
 import com.yaya.douban.tongcheng.adapter.TCLocsAdapter;
 import com.yaya.douban.tongcheng.requests.TCLocListRequest;
 import com.yaya.douban.tongcheng.responses.TCLocListResponse;
 import com.yaya.douban.tongcheng.types.Loc;
 
-public class LocsChooseActivity extends TCBaseActivity {
+public class LocsChooseActivity extends TCBaseActivity implements
+    ITCListViewCallBack {
   private final static int PERPAGE_COUNT = 20;
   private TCLocListRequest request;
   private EditText searchET;
-  private ListView citylist;
+  private TCListViewEx citylist;
   private TCLocsAdapter adapter;
   private int currentStart = 0;
 
@@ -35,7 +34,7 @@ public class LocsChooseActivity extends TCBaseActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_locslist);
-    citylist = (ListView) findViewById(R.id.citylist);
+    citylist = (TCListViewEx) findViewById(R.id.citylist);
     searchET = (EditText) findViewById(R.id.city_search);
     searchET.addTextChangedListener(new TextWatcher() {
 
@@ -55,41 +54,12 @@ public class LocsChooseActivity extends TCBaseActivity {
 
       }
     });
-    citylist.setOnScrollListener(new OnScrollListener() {
-
-      @Override
-      public void onScrollStateChanged(AbsListView view, int scrollState) {
-        switch (scrollState) {
-        case OnScrollListener.SCROLL_STATE_IDLE:
-          // 列表拉到最下方，继续请求更多城市，进度条啥的以后再添加吧
-          if (citylist.getLastVisiblePosition() == (citylist.getCount() - 1)) {
-            AppLog.e("xxxxScroll", "------last position--------");
-            requestCities();
-          }
-          break;
-        }
-      }
-
-      @Override
-      public void onScroll(AbsListView view, int firstVisibleItem,
-          int visibleItemCount, int totalItemCount) {
-      }
-    });
-    // 注册点击事件
-    citylist.setOnItemClickListener(new OnItemClickListener() {
-
-      @Override
-      public void onItemClick(AdapterView<?> parent, View view, int position,
-          long id) {
-        // 选中城市后 将城市存储到全局Appcontext里面并关闭Activity
-        AppContext.getInstance().setCurrentLoc((Loc) adapter.getItem(position));
-        setResult(RESULT_OK);
-        finish();
-      }
-    });
     adapter = new TCLocsAdapter(this);
+
+    citylist.registListCallBack(this);
     citylist.setAdapter(adapter);
-    requestCities();
+    citylist.setLoadingViewBgColor(getResources().getColor(R.color.white));
+    onLoadMore();
   }
 
   private void requestCities() {
@@ -98,6 +68,7 @@ public class LocsChooseActivity extends TCBaseActivity {
       @Override
       public void onRequestCompleted(BaseDataResponse dr) {
         if (dr instanceof TCLocListResponse) {
+          citylist.hideFooterProgress();
           TCLocListResponse response = (TCLocListResponse) dr;
           ArrayList<Loc> datas = new ArrayList<Loc>();
           for (Loc city : response.getData().getLocs()) {
@@ -111,5 +82,23 @@ public class LocsChooseActivity extends TCBaseActivity {
       }
     });
     request.getCities(currentStart, PERPAGE_COUNT);
+  }
+
+  @Override
+  public void onLoadMore() {
+    requestCities();
+    citylist.showFooterProgress();
+  }
+
+  @Override
+  public void onItemClick(AdapterView<?> parent, View view, int position,
+      long id) {
+    if (position >= adapter.getCount()) {
+      return;
+    }
+    // 选中城市后 将城市存储到全局Appcontext里面并关闭Activity
+    AppContext.getInstance().setCurrentLoc((Loc) adapter.getItem(position));
+    setResult(RESULT_OK);
+    finish();
   }
 }

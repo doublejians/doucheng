@@ -63,7 +63,7 @@
         android:layout_height="1dp"
         android:background="@color/gray" />
 
-    <ListView
+    <com.yaya.douban.common.widgets.TCListViewEx
         android:id="@+id/eventlist"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

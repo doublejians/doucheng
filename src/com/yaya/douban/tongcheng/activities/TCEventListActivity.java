@@ -7,11 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.AbsListView;
-import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,6 +16,8 @@ import com.yaya.douban.common.activities.AppContext;
 import com.yaya.douban.common.http.BaseDataRequest.NetworkCallBack;
 import com.yaya.douban.common.http.BaseDataResponse;
 import com.yaya.douban.common.utils.AppLog;
+import com.yaya.douban.common.widgets.TCListViewEx;
+import com.yaya.douban.common.widgets.TCListViewEx.ITCListViewCallBack;
 import com.yaya.douban.common.widgets.TCMenuPopup;
 import com.yaya.douban.common.widgets.TCMenuPopup.IMenuItemCallback;
 import com.yaya.douban.tongcheng.adapter.TCEventListAdapter;
@@ -29,9 +27,9 @@ import com.yaya.douban.tongcheng.types.Loc;
 import com.yaya.douban.tongcheng.types.TCEvent;
 
 public class TCEventListActivity extends TCBaseActivity implements
-    OnClickListener {
+    OnClickListener, ITCListViewCallBack {
   private TextView typeBt, dayTypeBt, locTypeBt; // 三个筛选按钮
-  private ListView eventList;// 活动列表
+  private TCListViewEx eventList;// 活动列表
   private TCEventListAdapter adapter;// 活动适配器
   private TCEventListRequest request;// 请求
   private int currentStart = 0;// 当前起始元素
@@ -45,52 +43,15 @@ public class TCEventListActivity extends TCBaseActivity implements
     typeBt = (TextView) findViewById(R.id.type);
     dayTypeBt = (TextView) findViewById(R.id.daytype);
     locTypeBt = (TextView) findViewById(R.id.loc);
-    eventList = (ListView) findViewById(R.id.eventlist);
+    eventList = (TCListViewEx) findViewById(R.id.eventlist);
 
     typeBt.setOnClickListener(this);
     dayTypeBt.setOnClickListener(this);
     locTypeBt.setOnClickListener(this);
 
     adapter = new TCEventListAdapter(this);
+    eventList.registListCallBack(this);
     eventList.setAdapter(adapter);
-    eventList.setOnItemClickListener(new OnItemClickListener() {
-
-      @Override
-      public void onItemClick(AdapterView<?> parent, View view, int position,
-          long id) {
-        if (position > adapter.getCount() - 1) {
-          return;
-        }
-        // 跳转到活动详情页，将选中的活动对象带到详情页
-        TCEvent event = (TCEvent) adapter.getItem(position);
-        AppContext.getInstance().setCurrentEvent(event);
-        Intent intent = new Intent();
-        intent.setClass(TCEventListActivity.this, TCEventDetailActivity.class);
-        TCEventListActivity.this.startActivity(intent);
-        AppLog.e("xxxxxxx",
-            "onItemCLick---->" + position + "    " + event.getTitle());
-      }
-    });
-    eventList.setOnScrollListener(new OnScrollListener() {
-
-      @Override
-      public void onScrollStateChanged(AbsListView view, int scrollState) {
-        switch (scrollState) {
-        case OnScrollListener.SCROLL_STATE_IDLE:
-          // 列表拉到最下方，继续请求更多城市，进度条啥的以后再添加吧
-          if (eventList.getLastVisiblePosition() == (eventList.getCount() - 1)) {
-            AppLog.e("xxxxScroll", "------last position--------");
-            requestEvents();
-          }
-          break;
-        }
-      }
-
-      @Override
-      public void onScroll(AbsListView view, int firstVisibleItem,
-          int visibleItemCount, int totalItemCount) {
-      }
-    });
     requestEvents();
   }
 
@@ -109,6 +70,7 @@ public class TCEventListActivity extends TCBaseActivity implements
             currentStart += result.getData().size();
           }
         }
+        eventList.hideFooterProgress();
       }
     });
     loc = AppContext.getInstance().getCurrentLoc().getId();
@@ -213,6 +175,28 @@ public class TCEventListActivity extends TCBaseActivity implements
       array.add(loc.getName());
     }
     return array;
+  }
+
+  @Override
+  public void onLoadMore() {
+    requestEvents();
+    eventList.showFooterProgress();
+  }
+
+  @Override
+  public void onItemClick(AdapterView<?> parent, View view, int position,
+      long id) {
+    if (position > adapter.getCount() - 1) {
+      return;
+    }
+    // 跳转到活动详情页，将选中的活动对象带到详情页
+    TCEvent event = (TCEvent) adapter.getItem(position);
+    AppContext.getInstance().setCurrentEvent(event);
+    Intent intent = new Intent();
+    intent.setClass(TCEventListActivity.this, TCEventDetailActivity.class);
+    TCEventListActivity.this.startActivity(intent);
+    AppLog.e("xxxxxxx",
+        "onItemCLick---->" + position + "    " + event.getTitle());
   }
 
 }
