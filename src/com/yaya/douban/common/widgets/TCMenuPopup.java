@@ -42,7 +42,7 @@ public class TCMenuPopup {
     listview = (ListView) coreView.findViewById(R.id.menulist);
     loadingView = coreView.findViewById(R.id.loading);
     listview.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-    listview.setBackgroundResource(R.drawable.shape_menu_bg);// (context.getResources().getColor(R.color.white));
+    listview.setBackgroundResource(R.drawable.shape_menu_bg);
     listview.setOnItemClickListener(new OnItemClickListener() {
       @Override
       public void onItemClick(AdapterView<?> parent, View view, int position,
@@ -55,7 +55,7 @@ public class TCMenuPopup {
     listview.setVisibility(View.INVISIBLE);
     loadingView.setVisibility(View.VISIBLE);
     popwindow.setWidth(anchor.getWidth());
-    popwindow.setHeight(anchor.getHeight());
+    popwindow.setHeight(-2);
     popwindow.setBackgroundDrawable(context.getResources().getDrawable(
         R.drawable.shape_menu_bg));
     popwindow.setContentView(coreView);
@@ -68,7 +68,7 @@ public class TCMenuPopup {
     listview.setVisibility(View.VISIBLE);
     loadingView.setVisibility(View.GONE);
     popwindow.setWidth(anchorView.getWidth());
-    popwindow.setHeight(anchorView.getHeight() * adapter.getCount());
+    popwindow.setHeight(-2);
   }
 
   public void showAsDropDown() {

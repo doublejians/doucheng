@@ -24,6 +24,7 @@ public abstract class BaseDataRequest implements Runnable {
   public static final String PATH_EVENT_DETAIL = "/v2/event/%1$s";// 活动详细信息
   public static final String PATH_EVENT_LIST = "/v2/event/list";// 活动列表
   public static final String PATH_EVENT_PHOTOS = "/v2/event/%1$s/photos";// 活动图片
+  public static final String PATH_EVENT_SEARCH = "/v2/event/search";// 活动图片
 
   // 请求的参数们。。。
   public static final String PARAM_START = "start"; // 开始元素
@@ -32,6 +33,7 @@ public abstract class BaseDataRequest implements Runnable {
   public static final String PARAM_TYPE = "type"; // 活动类型
   public static final String PARAM_DAY_TYPE = "day_type"; // 时间类型
   public static final String PARAM_LOC_DISTRICT = "district"; // 区
+  public static final String PARAM_EVENT_KEY = "q"; // 查询时间的关键词
 
   private static final int MESSAGE_REQUEST_COMPLETE = 1;
 

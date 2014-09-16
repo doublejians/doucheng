@@ -16,10 +16,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="活动列表" />
-    <Button
+
+    <Button
         android:id="@+id/bt_weekhot_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="一周热点" />
+
+    <Button
+        android:id="@+id/bt_event_search"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="活动搜索" />
 
 </LinearLayout>

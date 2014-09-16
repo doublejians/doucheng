@@ -12,6 +12,7 @@ import com.yaya.douban.common.http.BaseDataResponse;
 import com.yaya.douban.common.utils.AppLog;
 import com.yaya.douban.tongcheng.activities.LocsChooseActivity;
 import com.yaya.douban.tongcheng.activities.TCEventListActivity;
+import com.yaya.douban.tongcheng.activities.TCEventSearchActivity;
 import com.yaya.douban.tongcheng.activities.WeeklyHotActivity;
 import com.yaya.douban.tongcheng.requests.XSEventRequest;
 import com.yaya.douban.tongcheng.responses.XSEventResponse;
@@ -28,6 +29,7 @@ public class MainActivity extends Activity implements OnClickListener {
     findViewById(R.id.bt_start).setOnClickListener(this);
     findViewById(R.id.bt_event_list).setOnClickListener(this);
     findViewById(R.id.bt_weekhot_list).setOnClickListener(this);
+    findViewById(R.id.bt_event_search).setOnClickListener(this);
   }
 
   public void getEvetns() {
@@ -72,6 +74,11 @@ public class MainActivity extends Activity implements OnClickListener {
     case R.id.bt_weekhot_list: {
       Intent intent = new Intent(MainActivity.this, WeeklyHotActivity.class);
       AppLog.e(TAG, "bt_weekhot_list");
+      startActivity(intent);
+    }
+      break;
+    case R.id.bt_event_search: {
+      Intent intent = new Intent(MainActivity.this, TCEventSearchActivity.class);
       startActivity(intent);
     }
       break;

@@ -26,4 +26,15 @@ public class TCEventListRequest extends BaseDataRequest {
     startRequest();
   }
 
+  public void searchEvents(String loc, String key, int start, int count) {
+    path = PATH_EVENT_SEARCH;
+    values.put(PARAM_LOC, loc);
+    if (!Tools.isEmpty(key)) {
+      values.put(PARAM_EVENT_KEY, key);
+    }
+    values.put(PARAM_START, start + "");
+    values.put(PARAM_COUNT, count + "");
+    startRequest();
+  }
+
 }
