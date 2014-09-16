@@ -15,13 +15,15 @@ import com.yaya.douban.R;
  */
 public class TCBaseActivity extends Activity {
   protected Dialog loadingDialog;
+  protected boolean isCustomTitle = false;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-
+    if (!isCustomTitle) {
+      requestWindowFeature(Window.FEATURE_NO_TITLE);
+    }
     // 去除标题栏
-    requestWindowFeature(Window.FEATURE_NO_TITLE);
     loadingDialog = new Dialog(TCBaseActivity.this);
     loadingDialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
     loadingDialog.getWindow().setBackgroundDrawableResource(

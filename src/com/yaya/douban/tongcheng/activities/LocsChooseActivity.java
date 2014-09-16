@@ -6,8 +6,10 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.yaya.douban.R;
@@ -33,8 +35,18 @@ public class LocsChooseActivity extends TCBaseActivity implements
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
+    isCustomTitle = true;
+    setTheme(R.style.AppTheme);
+    requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
     setContentView(R.layout.activity_locslist);
+    getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,
+        R.layout.title_customer_default);
+    super.onCreate(savedInstanceState);
+    TextView titleTv = (TextView) findViewById(R.id.page_title);
+    titleTv.setText("选择城市");
+    findViewById(R.id.page_title_2).setVisibility(View.GONE);
+    findViewById(R.id.left_arrow).setVisibility(View.GONE);
+    findViewById(R.id.refresh).setVisibility(View.GONE);
     citylist = (TCListViewEx) findViewById(R.id.citylist);
     searchET = (EditText) findViewById(R.id.city_search);
     searchET.addTextChangedListener(new TextWatcher() {

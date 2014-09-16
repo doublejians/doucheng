@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/gray"
     android:clickable="false"
     android:focusable="false"
     android:orientation="vertical" >
@@ -13,8 +14,7 @@
 
         <TextView
             android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/gray" />
+            android:layout_height="1dp" />
 
         <TextView
             android:id="@+id/event_title"
