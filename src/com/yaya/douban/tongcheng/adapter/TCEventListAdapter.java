@@ -140,7 +140,8 @@ public class TCEventListAdapter extends BaseAdapter {
         options);
     // boolean isFree = !event.isHas_ticket();
     // holder.feeTv.setText(Html
-    // .fromHtml(isFree ? "<big><font color='#ba142b'>免费</font><big>" : "收费"));
+    // .fromHtml(isFree ? "<big><font color='#ba142b'>免费</font><big>" :
+    // "收费"));
     holder.ownerTv.setText("主办方：" + event.getOwner().getName());
   }
 
