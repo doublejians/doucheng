@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:id="@+id/containerBody"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical" >
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="@color/white"
+        android:orientation="horizontal" >
+
+        <ToggleButton
+            android:id="@+id/btnModule1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/transparent"
+            android:drawableTop="@drawable/indicator_tab_weeklyhot"
+            android:gravity="center"
+            android:padding="4dp"
+            android:textColor="@color/tab_toggle_color"
+            android:textOff="一周热点"
+            android:textOn="一周热点"
+            android:textSize="16sp" />
+
+        <ToggleButton
+            android:id="@+id/btnModule2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/transparent"
+            android:drawableTop="@drawable/indicator_tab_my"
+            android:gravity="center"
+            android:padding="4dp"
+            android:textColor="@color/tab_toggle_color"
+            android:textOff="浏览搜索"
+            android:textOn="浏览搜索"
+            android:textSize="16sp" />
+
+        <ToggleButton
+            android:id="@+id/btnModule3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/transparent"
+            android:drawableTop="@drawable/indicator_tab_my"
+            android:gravity="center"
+            android:padding="4dp"
+            android:textColor="@color/tab_toggle_color"
+            android:textOff="我的活动"
+            android:textOn="我的活动"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+</LinearLayout>

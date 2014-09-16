@@ -111,7 +111,8 @@ public class TCEventListAdapter extends BaseAdapter {
           .cacheOnDisc(true).bitmapConfig(Bitmap.Config.RGB_565) // 设置图片的解码类型
           .build();
     }
-    holder.titleTv.setText(event.getTitle());
+    holder.titleTv.setText(Html.fromHtml("<big><b>" + event.getTitle()
+        + "</b></big>"));
     String startStr = Tools.getStartEndStr(event.getBegin_time());
     String endStr = Tools.getStartEndStr(event.getEnd_time());
     String[] startStrs = startStr.split(" ");

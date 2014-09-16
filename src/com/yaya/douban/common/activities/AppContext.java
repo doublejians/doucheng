@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import android.app.Application;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 
 import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -13,6 +16,7 @@ import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import com.yaya.douban.R;
 import com.yaya.douban.common.http.BaseDataRequest.NetworkCallBack;
 import com.yaya.douban.common.http.BaseDataResponse;
+import com.yaya.douban.common.http.JsonSerializer;
 import com.yaya.douban.common.utils.AppLog;
 import com.yaya.douban.tongcheng.requests.TCLocListRequest;
 import com.yaya.douban.tongcheng.responses.TCLocListResponse;
@@ -20,13 +24,15 @@ import com.yaya.douban.tongcheng.types.Loc;
 import com.yaya.douban.tongcheng.types.TCEvent;
 
 public class AppContext extends Application {
-  public final static String INTENT_DISTICTS_WEB_RESULT = "com.doutongcheng.change.disticts";
-
+  public static final String INTENT_DISTICTS_WEB_RESULT = "com.doutongcheng.change.disticts";
+  private static final String SHAREDPREFRENCE_NAME = "doucheng";
+  private static final String SHAREDPREFRENCE_KEY_LOC = "lastloc";
   private static AppContext instance = new AppContext();
 
   private boolean distictsRequesting = false;
   private Loc currentLoc;// 当前城市
   private TCEvent currentEvent;// 正在查看或者操作的活动
+  private SharedPreferences sharedPreference;
   private LinkedHashMap<String, ArrayList<Loc>> disticts = new LinkedHashMap<String, ArrayList<Loc>>();// 缓存所有查看过的城市的区
   private static LinkedHashMap<String, String> eventTypes = new LinkedHashMap<String, String>();// 活动类型
   private static LinkedHashMap<String, String> eventDayTypes = new LinkedHashMap<String, String>();// 活动时间类型
@@ -34,6 +40,9 @@ public class AppContext extends Application {
   @Override
   public void onCreate() {
     super.onCreate();
+    sharedPreference = getSharedPreferences(SHAREDPREFRENCE_NAME,
+        Context.MODE_PRIVATE);
+    loadFromSharedPrerence();
     loadEventTypes();
     loadEventDayTypes();
     @SuppressWarnings("deprecation")
@@ -65,6 +74,30 @@ public class AppContext extends Application {
     }
   }
 
+  /**
+   * 还原用户上次选中的城市，默认为北京市
+   */
+  private void loadFromSharedPrerence() {
+    String locStr = sharedPreference
+        .getString(
+            SHAREDPREFRENCE_KEY_LOC,
+            "{\"parent\":\"china\",\"habitable\":\"yes\",\"id\":\"108288\",\"name\":\"北京\",\"uid\":\"beijing\"}");
+    currentLoc = JsonSerializer.getInstance().deserialize(locStr, Loc.class);
+  }
+
+  /**
+   * 保存用户上次选中的城市
+   */
+  private void saveLocToSharedPrerence() {
+    if (currentLoc == null) {
+      return;
+    }
+    Editor edit = sharedPreference.edit();
+    edit.putString(SHAREDPREFRENCE_KEY_LOC, JsonSerializer.getInstance()
+        .serialize(currentLoc));
+    edit.commit();
+  }
+
   public static AppContext getInstance() {
     return instance;
   }
@@ -75,6 +108,7 @@ public class AppContext extends Application {
 
   public void setCurrentLoc(Loc currentLoc) {
     this.currentLoc = currentLoc;
+    saveLocToSharedPrerence();
   }
 
   public ArrayList<Loc> getDistricts(String key) {
