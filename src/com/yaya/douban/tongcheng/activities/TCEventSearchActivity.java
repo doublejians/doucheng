@@ -60,4 +60,9 @@ public class TCEventSearchActivity extends TCBaseEventListActivity implements
     return true;
   }
 
+  @Override
+  public String getTitleTxt() {
+    return "活动搜索";
+  }
+
 }

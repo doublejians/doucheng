@@ -5,6 +5,7 @@ import java.util.Date;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.View;
@@ -26,7 +27,7 @@ import com.yaya.douban.tongcheng.responses.TCEventListResponse;
 import com.yaya.douban.tongcheng.types.TCEvent;
 
 public class WeeklyHotActivity extends TCBaseActivity implements
-    OnClickListener, OnLongClickListener {
+    OnClickListener, OnLongClickListener, ITitleCallBackForMain {
   private static final String TAG = "WeeklyHotActivity";
   private static DisplayImageOptions options;
   private WeeklyHotListRequest request;
@@ -197,5 +198,30 @@ public class WeeklyHotActivity extends TCBaseActivity implements
     fillEventListViewHolder(holder, event);
     return true;
 
+  }
+
+  @Override
+  public boolean isLeftButtonShow() {
+    return false;
+  }
+
+  @Override
+  public void onLeftButtonClicked() {
+    finish();
+  }
+
+  @Override
+  public void onRightButtonClicked() {
+
+  }
+
+  @Override
+  public Drawable getDrawableRightButton() {
+    return null;
+  }
+
+  @Override
+  public String getTitleTxt() {
+    return "一周热点";
   }
 }

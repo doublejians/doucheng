@@ -1,5 +1,8 @@
 package com.yaya.douban.tongcheng.activities;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -19,10 +22,12 @@ import com.yaya.douban.tongcheng.requests.TCEventListRequest;
  */
 public class TCEventMyActivity extends TCBaseEventListActivity implements
     OnClickListener {
+  private static final int DIALOG_LOGIN_PROMPT = 1;
   private static final int[] IDS_TAB = { R.id.tg_my_created, R.id.tg_my_wished,
       R.id.tg_my_participant };// togglebutton的ID，对应TCEventListRequest.TYPE_My_xxx的值
   private int reqType = TCEventListRequest.TYPE_MY_CREATED; // 类型，默认为我创建的
   private ToggleButton[] tabs = new ToggleButton[IDS_TAB.length];
+  private AlertDialog loginPromptDialog;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -35,21 +40,7 @@ public class TCEventMyActivity extends TCBaseEventListActivity implements
       tabs[index].setOnClickListener(this);
       tabs[index].setChecked(false);
     }
-    if (AppContext.getInstance().getToken() != null
-        && !Tools
-            .isEmpty(AppContext.getInstance().getToken().getAccess_token())) {
-      tabs[reqType].performClick();
-    }
-  }
-
-  @Override
-  protected void onResume() {
-    if (AppContext.getInstance().getToken() == null
-        || Tools.isEmpty(AppContext.getInstance().getToken().getAccess_token())) {
-      Intent intent = new Intent(TCEventMyActivity.this, LoginActivity.class);
-      startActivityForResult(intent, 111);
-    }
-    super.onResume();
+    tabs[reqType].performClick();
   }
 
   @Override
@@ -87,9 +78,40 @@ public class TCEventMyActivity extends TCBaseEventListActivity implements
 
   @Override
   protected boolean checkAndInitRequestParam() {
-    if (reqType > -1 && reqType < tabs.length) {
-      return true;
+    if (AppContext.getInstance().getToken() == null
+        || Tools.isEmpty(AppContext.getInstance().getToken().getAccess_token())) {
+      showDialog(DIALOG_LOGIN_PROMPT);
+      return false;
     }
-    return false;
+    if (reqType < 0 || reqType >= tabs.length) {
+      return false;
+    }
+    return true;
+  }
+
+  @Override
+  public String getTitleTxt() {
+    return "与我相关";
+  }
+
+  @Override
+  @Deprecated
+  protected Dialog onCreateDialog(int id) {
+    if (id == DIALOG_LOGIN_PROMPT) {
+      loginPromptDialog = new AlertDialog.Builder(this).setTitle("授权提示")
+          .setMessage("您还没有进行登录授权，无法查看您的页面，是否进入授权页面？")
+          .setPositiveButton("现在进入", new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+              Intent intent = new Intent(TCEventMyActivity.this,
+                  LoginActivity.class);
+              startActivityForResult(intent, 111);
+            }
+          }).setNegativeButton("不了，谢谢", null).setCancelable(true).create();
+      return loginPromptDialog;
+    }
+
+    return super.onCreateDialog(id);
   }
 }

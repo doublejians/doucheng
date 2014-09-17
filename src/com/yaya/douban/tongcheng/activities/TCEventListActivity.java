@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -196,5 +197,22 @@ public class TCEventListActivity extends TCBaseEventListActivity implements
       return false;
     }
     return true;
+  }
+
+  @Override
+  public String getTitleTxt() {
+    return "活动列表";
+  }
+
+  @Override
+  public Drawable getDrawableRightButton() {
+    return getResources().getDrawable(R.drawable.search_bg);
+  }
+
+  @Override
+  public void onRightButtonClicked() {
+    Intent intent = new Intent(TCEventListActivity.this,
+        TCEventSearchActivity.class);
+    startActivity(intent);
   }
 }

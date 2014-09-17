@@ -1,6 +1,7 @@
 package com.yaya.douban.tongcheng.activities;
 
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,7 +29,7 @@ import com.yaya.douban.tongcheng.types.TCEvent;
  * 
  */
 public abstract class TCBaseEventListActivity extends TCBaseActivity implements
-    ITCListViewCallBack {
+    ITCListViewCallBack, ITitleCallBackForMain {
   private TCListViewEx eventList;// 活动列表
   protected TCEventListAdapter adapter;// 活动适配器
   protected TCEventListRequest request;// 请求
@@ -162,4 +163,24 @@ public abstract class TCBaseEventListActivity extends TCBaseActivity implements
    * @return true参数可用 false参数有无
    */
   protected abstract boolean checkAndInitRequestParam();
+
+  @Override
+  public boolean isLeftButtonShow() {
+    return false;
+  }
+
+  @Override
+  public void onLeftButtonClicked() {
+    finish();
+  }
+
+  @Override
+  public Drawable getDrawableRightButton() {
+    return null;
+  }
+
+  @Override
+  public void onRightButtonClicked() {
+  }
+
 }

@@ -1,11 +1,13 @@
 package com.yaya.douban.common.activities;
 
+import android.app.Activity;
 import android.app.ActivityGroup;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
@@ -18,6 +20,7 @@ import android.widget.ToggleButton;
 import com.yaya.douban.R;
 import com.yaya.douban.common.utils.AppLog;
 import com.yaya.douban.common.utils.IntentUtils;
+import com.yaya.douban.tongcheng.activities.ITitleCallBackForMain;
 import com.yaya.douban.tongcheng.activities.LocsChooseActivity;
 import com.yaya.douban.tongcheng.activities.TCEventListActivity;
 import com.yaya.douban.tongcheng.activities.TCEventMyActivity;
@@ -30,9 +33,9 @@ public class MainActivityNew extends ActivityGroup implements
   private static final int TAB_COUNT = 3;
   private static final int[] ID_ToggleButton = { R.id.btnModule1,
       R.id.btnModule2, R.id.btnModule3 };
-  private static final String[] TAB_TITLES = { "一周热点", "活动列表", "活动搜索" };
   private static final Class<?>[] classes = { WeeklyHotActivity.class,
       TCEventListActivity.class, TCEventMyActivity.class };
+  private ITitleCallBackForMain[] callbacks = new ITitleCallBackForMain[TAB_COUNT];
   private LinearLayout container = null;
   private AlertDialog exitDialog;
   private TextView titleTv, cityTv;
@@ -129,24 +132,47 @@ public class MainActivityNew extends ActivityGroup implements
           tabButtons[i].setChecked(true);
         }
       }
-      titleTv.setText(TAB_TITLES[tag]);
 
       container.removeAllViews();
+      String aid = "Module" + tag;
       container.addView(
           getLocalActivityManager().startActivity(
-              "Module" + tag,
+              aid,
               new Intent(MainActivityNew.this, classes[tag])
                   .addFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT))
               .getDecorView(), -1, -1);
+      updateTitleBar(getLocalActivityManager().getActivity(aid));
     } else if (id == R.id.left_arrow) {
-      // TODO
-
+      if (callbacks[currentTab] != null) {
+        callbacks[currentTab].onLeftButtonClicked();
+      }
     } else if (id == R.id.refresh) {
-      // TODO
+      if (callbacks[currentTab] != null) {
+        callbacks[currentTab].onRightButtonClicked();
+      }
     } else if (id == R.id.page_title_2) {
       Intent intent = new Intent(MainActivityNew.this, LocsChooseActivity.class);
       intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
       startActivity(intent);
+    }
+  }
+
+  private void updateTitleBar(Activity activity) {
+    if (activity instanceof ITitleCallBackForMain) {
+      if (callbacks[currentTab] == null) {
+        callbacks[currentTab] = (ITitleCallBackForMain) activity;
+      }
+      titleTv.setText(callbacks[currentTab].getTitleTxt());
+      backIb
+          .setVisibility(callbacks[currentTab].isLeftButtonShow() ? View.VISIBLE
+              : View.GONE);
+      Drawable drawable = callbacks[currentTab].getDrawableRightButton();
+      if (drawable != null) {
+        refreshIb.setVisibility(View.VISIBLE);
+        refreshIb.setBackgroundDrawable(drawable);
+      } else {
+        refreshIb.setVisibility(View.GONE);
+      }
     }
   }
 }
