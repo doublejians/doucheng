@@ -1,8 +1,13 @@
 package com.yaya.douban.common.activities;
 
 import android.app.ActivityGroup;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.widget.ImageButton;
@@ -11,25 +16,29 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.yaya.douban.R;
+import com.yaya.douban.common.utils.AppLog;
+import com.yaya.douban.common.utils.IntentUtils;
 import com.yaya.douban.tongcheng.activities.LocsChooseActivity;
 import com.yaya.douban.tongcheng.activities.TCEventListActivity;
-import com.yaya.douban.tongcheng.activities.TCEventSearchActivity;
+import com.yaya.douban.tongcheng.activities.TCEventMyActivity;
 import com.yaya.douban.tongcheng.activities.WeeklyHotActivity;
 
 @SuppressWarnings("deprecation")
 public class MainActivityNew extends ActivityGroup implements
     View.OnClickListener {
+  private static final int DIALOG_EXIT = 1;
   private static final int TAB_COUNT = 3;
   private static final int[] ID_ToggleButton = { R.id.btnModule1,
       R.id.btnModule2, R.id.btnModule3 };
   private static final String[] TAB_TITLES = { "一周热点", "活动列表", "活动搜索" };
   private static final Class<?>[] classes = { WeeklyHotActivity.class,
-      TCEventListActivity.class, TCEventSearchActivity.class };
-
+      TCEventListActivity.class, TCEventMyActivity.class };
   private LinearLayout container = null;
+  private AlertDialog exitDialog;
   private TextView titleTv, cityTv;
   private ImageButton backIb, refreshIb;
   private ToggleButton[] tabButtons = new ToggleButton[TAB_COUNT];
+  private int currentTab = 0;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -55,19 +64,45 @@ public class MainActivityNew extends ActivityGroup implements
       tabButtons[i].setOnClickListener(this);
       tabButtons[i].setTag(i);
     }
-    container.post(new Runnable() {
+    AppContext.getInstance().setPageNeedRefresh(true);
+  }
 
-      @Override
-      public void run() {
-        tabButtons[0].performClick();
-      }
-    });
+  @Override
+  public boolean dispatchKeyEvent(KeyEvent event) {
+    if (event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
+      showDialog(DIALOG_EXIT);
+      return true;
+    }
+    return super.dispatchKeyEvent(event);
+  }
+
+  @Override
+  @Deprecated
+  protected Dialog onCreateDialog(int id) {
+    if (id == DIALOG_EXIT) {
+      exitDialog = new AlertDialog.Builder(this).setTitle("退出")
+          .setMessage("确定退出豆城？").setPositiveButton("确定", new OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+              IntentUtils.broadcastAppFinished();
+              finish();
+            }
+          }).setNegativeButton("取消", null).setCancelable(true).create();
+      return exitDialog;
+    }
+    return super.onCreateDialog(id);
   }
 
   @Override
   protected void onResume() {
     super.onResume();
     cityTv.setText(AppContext.getInstance().getCurrentLoc().getName());
+    if (AppContext.getInstance().isPageNeedRefresh()) {
+      tabButtons[currentTab].performClick();
+      AppContext.getInstance().setPageNeedRefresh(false);
+      AppLog.e("xxxxMain", "refresh ");
+    }
   }
 
   @Override
@@ -86,6 +121,7 @@ public class MainActivityNew extends ActivityGroup implements
         return;
       }
       tag = (Integer) v.getTag();
+      currentTab = tag;
       for (int i = 0; i < tabButtons.length; i++) {
         if (tag != i) {
           tabButtons[i].setChecked(false);
@@ -98,10 +134,10 @@ public class MainActivityNew extends ActivityGroup implements
       container.removeAllViews();
       container.addView(
           getLocalActivityManager().startActivity(
-              "Module1",
+              "Module" + tag,
               new Intent(MainActivityNew.this, classes[tag])
-                  .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)).getDecorView(),
-          -1, -1);
+                  .addFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT))
+              .getDecorView(), -1, -1);
     } else if (id == R.id.left_arrow) {
       // TODO
 

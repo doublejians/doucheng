@@ -5,12 +5,17 @@ public class User {
   private boolean is_banned;
   private boolean is_suicide;
   private String large_avatar;
-  protected String avatar;
+  protected String avatar;// 头像小图
   protected String alt;
   protected String id;
   protected String name;
   protected String uid;
   protected String type; // user,site
+  protected String relation;// 和当前登录用户的关系，friend或contact
+  protected String created;// 注册时间
+  protected String loc_id; // 城市id
+  protected String loc_name; // 所在地全称
+  protected String desc;
 
   public boolean isIs_banned() {
     return is_banned;

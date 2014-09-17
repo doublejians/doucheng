@@ -9,13 +9,7 @@ import android.widget.Toast;
 
 import com.yaya.douban.R;
 import com.yaya.douban.common.activities.AppContext;
-import com.yaya.douban.common.http.BaseDataRequest;
-import com.yaya.douban.common.http.BaseDataRequest.NetworkCallBack;
-import com.yaya.douban.common.http.BaseDataResponse;
-import com.yaya.douban.common.utils.AppLog;
 import com.yaya.douban.common.utils.Tools;
-import com.yaya.douban.tongcheng.requests.TCEventListRequest;
-import com.yaya.douban.tongcheng.responses.TCEventListResponse;
 
 public class TCEventSearchActivity extends TCBaseEventListActivity implements
     OnClickListener {
@@ -31,52 +25,6 @@ public class TCEventSearchActivity extends TCBaseEventListActivity implements
   }
 
   @Override
-  protected void requestEvents() {
-    BaseDataRequest.unregistNetworkCallback(request);
-    key = keyEt.getText() != null ? keyEt.getText().toString() : null;
-    if (Tools.isEmpty(key)) {
-      Toast.makeText(TCEventSearchActivity.this, "请输入关键字", Toast.LENGTH_SHORT)
-          .show();
-      return;
-    }
-    request = new TCEventListRequest();
-    request.registNetworkCallback(new NetworkCallBack() {
-
-      @Override
-      public void onRequestCompleted(BaseDataResponse dr) {
-        if (dr instanceof TCEventListResponse) {
-          hideListProgress();
-          if (dr.getResultCode() == 200) {
-            TCEventListResponse result = (TCEventListResponse) dr;
-            if (isAppend) {
-              adapter.appendData(result.getData());
-              AppLog.e("xxxxEvent", "append " + (result.getData() == null));
-            } else {
-              adapter.setData(result.getData());
-              AppLog.e("xxxxEvent", "setData " + (result.getData() == null));
-            }
-            currentStart += result.getData().size();
-
-            Toast.makeText(
-                TCEventSearchActivity.this,
-                "共为您找到" + result.getTotal() + "个活动,当前" + currentStart + "/"
-                    + result.getTotal(), Toast.LENGTH_SHORT).show();
-          }
-        }
-        isAppend = false;
-        hideListProgress();
-        hideProgeressDialog();
-      }
-    });
-    loc = AppContext.getInstance().getCurrentLoc().getId();
-    if (isAppend) {
-      showListProgress();
-    }
-    showProgressDialog();
-    request.searchEvents(loc, key, currentStart, 10);
-  }
-
-  @Override
   protected int getLayoutId() {
     return R.layout.activity_event_search;
   }
@@ -87,6 +35,29 @@ public class TCEventSearchActivity extends TCBaseEventListActivity implements
       currentStart = 0;
       requestEvents();
     }
+  }
+
+  @Override
+  protected void requestMethod() {
+    request.searchEvents(loc, key, currentStart, 10);
+  }
+
+  @Override
+  protected boolean checkAndInitRequestParam() {
+    key = keyEt.getText() != null ? keyEt.getText().toString() : null;
+    loc = AppContext.getInstance().getCurrentLoc().getId();
+    if (loc == null) {
+      Toast
+          .makeText(TCEventSearchActivity.this, "请选择城市后查看", Toast.LENGTH_SHORT)
+          .show();
+      return false;
+    }
+    if (Tools.isEmpty(key)) {
+      Toast.makeText(TCEventSearchActivity.this, "请输入关键字", Toast.LENGTH_SHORT)
+          .show();
+      return false;
+    }
+    return true;
   }
 
 }

@@ -41,6 +41,12 @@
         <activity
             android:name="com.yaya.douban.tongcheng.activities.TCEventSearchActivity"
             android:configChanges="keyboardHidden|orientation" />
+        <activity
+            android:name="com.yaya.douban.tongcheng.activities.LoginActivity"
+            android:configChanges="keyboardHidden|orientation" />
+        <activity
+            android:name="com.yaya.douban.tongcheng.activities.TCEventMyActivity"
+            android:configChanges="keyboardHidden|orientation" />
     </application>
 
 </manifest>

@@ -5,7 +5,6 @@ import java.util.LinkedHashMap;
 
 import android.app.Application;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 
@@ -18,18 +17,27 @@ import com.yaya.douban.common.http.BaseDataRequest.NetworkCallBack;
 import com.yaya.douban.common.http.BaseDataResponse;
 import com.yaya.douban.common.http.JsonSerializer;
 import com.yaya.douban.common.utils.AppLog;
+import com.yaya.douban.common.utils.IntentUtils;
 import com.yaya.douban.tongcheng.requests.TCLocListRequest;
 import com.yaya.douban.tongcheng.responses.TCLocListResponse;
 import com.yaya.douban.tongcheng.types.Loc;
 import com.yaya.douban.tongcheng.types.TCEvent;
+import com.yaya.douban.tongcheng.types.Token;
 
 public class AppContext extends Application {
-  public static final String INTENT_DISTICTS_WEB_RESULT = "com.doutongcheng.change.disticts";
+  public static final String TC_API_KEY = "006aa3d3ccd2ce83013feb7b66786b89";
+  public static final String TC_CLIENT_SECRET = "8ee38a1a35df9b5d";
+  public final static String OAUTH_REDIRECT_URI = "https://www.example.com/back";
+
   private static final String SHAREDPREFRENCE_NAME = "doucheng";
   private static final String SHAREDPREFRENCE_KEY_LOC = "lastloc";
+  private static final String SHAREDPREFRENCE_KEY_TOKEN = "token";
+
   private static AppContext instance = new AppContext();
 
   private boolean distictsRequesting = false;
+  private boolean pageNeedRefresh = false;
+  private Token token;
   private Loc currentLoc;// 当前城市
   private TCEvent currentEvent;// 正在查看或者操作的活动
   private SharedPreferences sharedPreference;
@@ -75,14 +83,34 @@ public class AppContext extends Application {
   }
 
   /**
-   * 还原用户上次选中的城市，默认为北京市
+   * 从xml中读取存取的信息
    */
   private void loadFromSharedPrerence() {
+    // 还原用户上次选中的城市，默认为北京市
     String locStr = sharedPreference
         .getString(
             SHAREDPREFRENCE_KEY_LOC,
             "{\"parent\":\"china\",\"habitable\":\"yes\",\"id\":\"108288\",\"name\":\"北京\",\"uid\":\"beijing\"}");
     currentLoc = JsonSerializer.getInstance().deserialize(locStr, Loc.class);
+    // 查看token
+    String tokenStr = sharedPreference.getString(SHAREDPREFRENCE_KEY_TOKEN,
+        null);
+    if (tokenStr != null) {
+      token = JsonSerializer.getInstance().deserialize(tokenStr, Token.class);
+    }
+  }
+
+  /**
+   * 保存用户Token
+   */
+  private void saveTokenToSharedPrerence() {
+    if (token == null) {
+      return;
+    }
+    Editor edit = sharedPreference.edit();
+    edit.putString(SHAREDPREFRENCE_KEY_TOKEN, JsonSerializer.getInstance()
+        .serialize(token));
+    edit.commit();
   }
 
   /**
@@ -98,6 +126,23 @@ public class AppContext extends Application {
     edit.commit();
   }
 
+  public boolean isPageNeedRefresh() {
+    return pageNeedRefresh;
+  }
+
+  public void setPageNeedRefresh(boolean pageNeedRefresh) {
+    this.pageNeedRefresh = pageNeedRefresh;
+  }
+
+  public Token getToken() {
+    return token;
+  }
+
+  public void setToken(Token token) {
+    this.token = token;
+    saveTokenToSharedPrerence();
+  }
+
   public static AppContext getInstance() {
     return instance;
   }
@@ -109,6 +154,7 @@ public class AppContext extends Application {
   public void setCurrentLoc(Loc currentLoc) {
     this.currentLoc = currentLoc;
     saveLocToSharedPrerence();
+    pageNeedRefresh = true;
   }
 
   public ArrayList<Loc> getDistricts(String key) {
@@ -172,18 +218,12 @@ public class AppContext extends Application {
               AppLog.e("xxxDisticts", "-===========" + loc.getName());
             }
             disticts.put(key, locs);
-            broadcastDistictsChange();
+            IntentUtils.broadcastDistictsChange();
           }
         }
         distictsRequesting = false;
       }
     });
     request.getDistricts(currentLoc.getId(), 0, 30);
-  }
-
-  private void broadcastDistictsChange() {
-    Intent intent = new Intent();
-    intent.setAction(INTENT_DISTICTS_WEB_RESULT);
-    AppContext.getInstance().getApplicationContext().sendBroadcast(intent);
   }
 }

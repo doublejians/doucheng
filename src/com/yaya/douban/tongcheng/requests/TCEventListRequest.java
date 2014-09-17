@@ -1,11 +1,15 @@
 package com.yaya.douban.tongcheng.requests;
 
+import com.yaya.douban.common.activities.AppContext;
 import com.yaya.douban.common.http.BaseDataParser;
 import com.yaya.douban.common.http.BaseDataRequest;
 import com.yaya.douban.common.utils.Tools;
 import com.yaya.douban.tongcheng.parsers.TCEventListParser;
 
 public class TCEventListRequest extends BaseDataRequest {
+  public static final int TYPE_MY_CREATED = 0;
+  public static final int TYPE_MY_WISHED = 1;
+  public static final int TYPE_MY_PARTICIPATED = 2;
 
   @Override
   protected BaseDataParser createParser() {
@@ -37,4 +41,27 @@ public class TCEventListRequest extends BaseDataRequest {
     startRequest();
   }
 
+  /**
+   * 获取当前用户创建、参加、感兴趣的活动
+   * 
+   * @param start
+   * @param count
+   */
+  public void getMyEvents(int type, int start, int count) {
+    if (type == TYPE_MY_CREATED) {
+      path = PATH_EVENT_USER_CREATED;
+    } else if (type == TYPE_MY_WISHED) {
+      path = PATH_EVENT_USER_WISHED;
+    } else if (type == TYPE_MY_PARTICIPATED) {
+      path = PATH_EVENT_USER_PARTICIPATED;
+    }
+    if (AppContext.getInstance().getToken() == null) {
+      return;
+    }
+    path = String.format(path, AppContext.getInstance().getToken()
+        .getDouban_user_id());
+    values.put(PARAM_START, start + "");
+    values.put(PARAM_COUNT, count + "");
+    startRequest();
+  }
 }

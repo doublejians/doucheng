@@ -6,14 +6,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Toast;
 
 import com.yaya.douban.R;
 import com.yaya.douban.common.activities.AppContext;
+import com.yaya.douban.common.http.BaseDataRequest;
+import com.yaya.douban.common.http.BaseDataRequest.NetworkCallBack;
+import com.yaya.douban.common.http.BaseDataResponse;
 import com.yaya.douban.common.utils.AppLog;
 import com.yaya.douban.common.widgets.TCListViewEx;
 import com.yaya.douban.common.widgets.TCListViewEx.ITCListViewCallBack;
 import com.yaya.douban.tongcheng.adapter.TCEventListAdapter;
 import com.yaya.douban.tongcheng.requests.TCEventListRequest;
+import com.yaya.douban.tongcheng.responses.TCEventListResponse;
 import com.yaya.douban.tongcheng.types.TCEvent;
 
 /**
@@ -92,8 +97,69 @@ public abstract class TCBaseEventListActivity extends TCBaseActivity implements
   /**
    * 请求数据，各个子类实现对应的请求
    */
-  protected abstract void requestEvents();
+  protected final void requestEvents() {
+    if (!checkAndInitRequestParam()) {
+      return;
+    }
+    // 注销回调
+    BaseDataRequest.unregistNetworkCallback(request);
+    request = new TCEventListRequest();
+    request.registNetworkCallback(new NetworkCallBack() {
+
+      @Override
+      public void onRequestCompleted(BaseDataResponse dr) {
+        if (dr instanceof TCEventListResponse) {
+          hideListProgress();
+          if (dr.getResultCode() == 200) {
+            TCEventListResponse result = (TCEventListResponse) dr;
+            if (isAppend) {
+              adapter.appendData(result.getData());
+              AppLog.e("xxxxEvent", "append " + (result.getData() == null));
+            } else {
+              adapter.setData(result.getData());
+              AppLog.e("xxxxEvent", "setData " + (result.getData() == null));
+            }
+            currentStart += result.getData().size();
+
+            promptOnSuccess(result.getTotal());// 成功后的提示
+          }
+        }
+        isAppend = false;
+        hideListProgress();
+        hideProgeressDialog();
+      }
+    });
+    if (isAppend) {
+      showListProgress();
+    } else {
+      currentStart = 0;
+    }
+    showProgressDialog();
+    requestMethod();
+  }
+
+  /**
+   * 请求成功后的提示
+   * 
+   * @param total
+   */
+  protected void promptOnSuccess(int total) {
+    Toast.makeText(TCBaseEventListActivity.this,
+        "共为您找到" + total + "个活动,当前" + currentStart + "/" + total,
+        Toast.LENGTH_SHORT).show();
+  }
 
   protected abstract int getLayoutId();
 
+  /**
+   * 由于每个子类都是调用同一个request类的方法，处理逻辑也差不多，所以只需要子类声明调用哪个方法即可
+   */
+  protected abstract void requestMethod();
+
+  /**
+   * 请求之前调用，判定参数等是否满足请求，并给出相应提示
+   * 
+   * @return true参数可用 false参数有无
+   */
+  protected abstract boolean checkAndInitRequestParam();
 }

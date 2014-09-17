@@ -1,6 +1,7 @@
 package com.yaya.douban.common.http;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -12,10 +13,18 @@ import java.util.zip.GZIPInputStream;
 import android.os.Handler;
 import android.os.Message;
 
+import com.yaya.douban.common.activities.AppContext;
 import com.yaya.douban.common.utils.AppLog;
+import com.yaya.douban.common.utils.Tools;
 
 public abstract class BaseDataRequest implements Runnable {
-  public static String[] REQUEST_METHOD = { "GET", "POST", "PUT", "DELETE" };
+  // 请求方式相关
+  public static final String[] REQUEST_METHODS = { "GET", "POST", "PUT",
+      "DELETE" };
+  public static final int REQUEST_GET = 0;
+  public static final int REQUEST_POST = 1;
+  public static final int REQUEST_PUT = 2;
+  public static final int REQUEST_DELETE = 3;
 
   public static final String URL_DEFAULT = "https://api.douban.com";
   // 各种路径
@@ -24,7 +33,10 @@ public abstract class BaseDataRequest implements Runnable {
   public static final String PATH_EVENT_DETAIL = "/v2/event/%1$s";// 活动详细信息
   public static final String PATH_EVENT_LIST = "/v2/event/list";// 活动列表
   public static final String PATH_EVENT_PHOTOS = "/v2/event/%1$s/photos";// 活动图片
-  public static final String PATH_EVENT_SEARCH = "/v2/event/search";// 活动图片
+  public static final String PATH_EVENT_SEARCH = "/v2/event/search";// 搜索活动
+  public static final String PATH_EVENT_USER_PARTICIPATED = "/v2/event/user_participated/%1$s";// 用户参加的
+  public static final String PATH_EVENT_USER_WISHED = "/v2/event/user_wished/%1$s";// 用户感兴趣的
+  public static final String PATH_EVENT_USER_CREATED = "/v2/event/user_created/%1$s";// 用户创建的
 
   // 请求的参数们。。。
   public static final String PARAM_START = "start"; // 开始元素
@@ -35,13 +47,25 @@ public abstract class BaseDataRequest implements Runnable {
   public static final String PARAM_LOC_DISTRICT = "district"; // 区
   public static final String PARAM_EVENT_KEY = "q"; // 查询时间的关键词
 
+  // token请求相关
+  public static final String PARAM_CLIENT_ID = "client_id"; //
+  public static final String PARAM_CLIENT_SECRET = "client_secret"; //
+  public static final String PARAM_REDIRECT_URI = "redirect_uri";
+  public static final String PARAM_GRANT_TYPE = "grant_type";
+  public static final String PARAM_CODE = "code";
+  public static final String PARAM_REFRESH_TOKEN = "refresh_token";
+  public static final String PARAM_SCOPE = "scope";
+  public static final String PARAM_RESPONSE_TYPE = "response_type";
+  public static final String PARAM_STATE = "state";
+
   private static final int MESSAGE_REQUEST_COMPLETE = 1;
 
   protected String url = URL_DEFAULT;
   protected String path;
   protected Map<String, String> values = new HashMap<String, String>();// 各种参数集合
 
-  protected int requestMethod = 0;// 请求方式
+  protected int requestMethod = REQUEST_GET;// 请求方式，默认get
+  protected boolean valuesAppendInUrl = true;
   protected int start;// 起始元素
   protected int count;// 返回结果的数量
   protected BaseDataResponse response = new BaseDataResponse();
@@ -69,15 +93,28 @@ public abstract class BaseDataRequest implements Runnable {
     HttpURLConnection conn;
     try {
       String realUrl = buildRealUrl();
-      realUrl = realUrl + (realUrl.contains("?") ? "&" : "?")
-          + "apikey=0339b495d888705009ad1dc1899950f0";
+      realUrl = realUrl + (realUrl.contains("?") ? "&" : "?") + "apikey="
+          + AppContext.TC_API_KEY;// 0339b495d888705009ad1dc1899950f0
 
       AppLog.e("xxxUrl", "realUrl--->" + realUrl);
       conn = (HttpURLConnection) new URL(realUrl).openConnection();
       conn.setConnectTimeout(10000);
 
-      conn.setRequestMethod(REQUEST_METHOD[requestMethod]);
+      conn.setRequestMethod(REQUEST_METHODS[requestMethod]);
       conn.setRequestProperty("Accept-Charset", "UTF-8");
+
+      if (requestMethod == REQUEST_POST && valuesAppendInUrl) {
+        // Post 请求不能使用缓存
+        conn.setUseCaches(false);
+        conn.setDoOutput(true);
+        String paramStr = getValuesStr();
+        if (!Tools.isEmpty(paramStr)) {
+          DataOutputStream out = new DataOutputStream(conn.getOutputStream());
+          out.write(paramStr.getBytes("UTF-8"));
+          out.flush();
+          out.close();
+        }
+      }
       parser = createParser();
 
       int rsCode = conn.getResponseCode();
@@ -115,15 +152,22 @@ public abstract class BaseDataRequest implements Runnable {
     if (values.isEmpty() || requestMethod != 0) {
       return builder.toString();
     }
-    if (requestMethod == 0) {
-      builder.append("?");
-      Set<String> keys = values.keySet();
-      for (String key : keys) {
-        builder.append(key + "=" + values.get(key) + "&");
+    if (requestMethod == REQUEST_GET || valuesAppendInUrl) {
+      String params = getValuesStr();
+      if (!Tools.isEmpty(params)) {
+        builder.append("?" + params);
       }
-      return builder.substring(0, builder.length() - 1);
     }
     return builder.toString();
+  }
+
+  private String getValuesStr() {
+    StringBuilder builder = new StringBuilder();
+    Set<String> keys = values.keySet();
+    for (String key : keys) {
+      builder.append(key + "=" + values.get(key) + "&");
+    }
+    return builder.substring(0, builder.length() - 1);
   }
 
   public void startRequest() {

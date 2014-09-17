@@ -15,14 +15,10 @@ import android.widget.Toast;
 
 import com.yaya.douban.R;
 import com.yaya.douban.common.activities.AppContext;
-import com.yaya.douban.common.http.BaseDataRequest;
-import com.yaya.douban.common.http.BaseDataRequest.NetworkCallBack;
-import com.yaya.douban.common.http.BaseDataResponse;
 import com.yaya.douban.common.utils.AppLog;
+import com.yaya.douban.common.utils.IntentUtils;
 import com.yaya.douban.common.widgets.TCMenuPopup;
 import com.yaya.douban.common.widgets.TCMenuPopup.IMenuItemCallback;
-import com.yaya.douban.tongcheng.requests.TCEventListRequest;
-import com.yaya.douban.tongcheng.responses.TCEventListResponse;
 import com.yaya.douban.tongcheng.types.Loc;
 
 public class TCEventListActivity extends TCBaseEventListActivity implements
@@ -44,7 +40,7 @@ public class TCEventListActivity extends TCBaseEventListActivity implements
     locTypeBt.setOnClickListener(this);
 
     intentFilter = new IntentFilter();
-    intentFilter.addAction(AppContext.INTENT_DISTICTS_WEB_RESULT);
+    intentFilter.addAction(IntentUtils.INTENT_DISTICTS_WEB_RESULT);
     locReceiver = new BroadcastReceiver() {
       @Override
       public void onReceive(Context context, Intent intent) {
@@ -182,47 +178,23 @@ public class TCEventListActivity extends TCBaseEventListActivity implements
   }
 
   @Override
-  protected void requestEvents() {
-    BaseDataRequest.unregistNetworkCallback(request);
-    request = new TCEventListRequest();
-    request.registNetworkCallback(new NetworkCallBack() {
+  protected int getLayoutId() {
+    return R.layout.activity_eventlist;
+  }
 
-      @Override
-      public void onRequestCompleted(BaseDataResponse dr) {
-        if (dr instanceof TCEventListResponse) {
-          hideListProgress();
-          if (dr.getResultCode() == 200) {
-            TCEventListResponse result = (TCEventListResponse) dr;
-            if (isAppend) {
-              adapter.appendData(result.getData());
-              AppLog.e("xxxxEvent", "append " + (result.getData() == null));
-            } else {
-              adapter.setData(result.getData());
-              AppLog.e("xxxxEvent", "setData " + (result.getData() == null));
-            }
-
-            currentStart += result.getData().size();
-            Toast.makeText(
-                TCEventListActivity.this,
-                "共为您找到" + result.getTotal() + "个活动,当前" + currentStart + "/"
-                    + result.getTotal(), Toast.LENGTH_SHORT).show();
-          }
-        }
-        isAppend = false;
-        hideListProgress();
-        hideProgeressDialog();
-      }
-    });
-    loc = AppContext.getInstance().getCurrentLoc().getId();
-    showProgressDialog();
-    if (isAppend) {
-      showListProgress();
-    }
+  @Override
+  protected void requestMethod() {
     request.getEvents(loc, district, type, daytype, currentStart, 20);
   }
 
   @Override
-  protected int getLayoutId() {
-    return R.layout.activity_eventlist;
+  protected boolean checkAndInitRequestParam() {
+    loc = AppContext.getInstance().getCurrentLoc().getId();
+    if (loc == null) {
+      Toast.makeText(TCEventListActivity.this, "请选择城市后查看", Toast.LENGTH_SHORT)
+          .show();
+      return false;
+    }
+    return true;
   }
 }

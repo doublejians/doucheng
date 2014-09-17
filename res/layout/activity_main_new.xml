@@ -16,7 +16,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:background="@color/white"
+        android:background="@color/light_black"
         android:orientation="horizontal" >
 
         <ToggleButton
@@ -28,7 +28,7 @@
             android:drawableTop="@drawable/indicator_tab_weeklyhot"
             android:gravity="center"
             android:padding="4dp"
-            android:textColor="@color/tab_toggle_color"
+            android:textColor="@color/tab_toggle_color_white_green"
             android:textOff="一周热点"
             android:textOn="一周热点"
             android:textSize="16sp" />
@@ -39,10 +39,10 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@color/transparent"
-            android:drawableTop="@drawable/indicator_tab_my"
+            android:drawableTop="@drawable/indicator_tab_eventlist"
             android:gravity="center"
             android:padding="4dp"
-            android:textColor="@color/tab_toggle_color"
+            android:textColor="@color/tab_toggle_color_white_green"
             android:textOff="浏览搜索"
             android:textOn="浏览搜索"
             android:textSize="16sp" />
@@ -56,7 +56,7 @@
             android:drawableTop="@drawable/indicator_tab_my"
             android:gravity="center"
             android:padding="4dp"
-            android:textColor="@color/tab_toggle_color"
+            android:textColor="@color/tab_toggle_color_white_green"
             android:textOff="我的活动"
             android:textOn="我的活动"
             android:textSize="16sp" />
