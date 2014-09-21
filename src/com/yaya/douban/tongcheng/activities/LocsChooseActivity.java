@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
@@ -27,6 +28,7 @@ import com.yaya.douban.tongcheng.types.Loc;
 public class LocsChooseActivity extends TCBaseActivity implements
     ITCListViewCallBack {
   private final static int PERPAGE_COUNT = 20;
+  protected static final String TAG = "LocsChooseActivity";
   private TCLocListRequest request;
   private EditText searchET;
   private TCListViewEx citylist;
@@ -53,7 +55,6 @@ public class LocsChooseActivity extends TCBaseActivity implements
 
       @Override
       public void onTextChanged(CharSequence s, int start, int before, int count) {
-        // TODO
       }
 
       @Override
@@ -83,11 +84,21 @@ public class LocsChooseActivity extends TCBaseActivity implements
         if (dr instanceof TCLocListResponse) {
           TCLocListResponse response = (TCLocListResponse) dr;
           ArrayList<Loc> datas = new ArrayList<Loc>();
+          if (currentStart == 0) {// 第一次搜索城市
+          
+            
+            Loc tempLoc = ((AppContext)getApplication()).getLocation().getLoc();
+          if(tempLoc!=null)
+            datas.add(tempLoc);
+          }
+
           for (Loc city : response.getData().getLocs()) {
             datas.add(city);
           }
           currentStart += datas.size();
+          Log.e(TAG, "onCreate3"+currentStart);
           adapter.appendData(datas);
+          Log.e(TAG, "onCreate4");
         } else {
           AppLog.e("xxxx", "null or error");
           Toast.makeText(LocsChooseActivity.this, "发生错误", Toast.LENGTH_SHORT)
@@ -95,7 +106,7 @@ public class LocsChooseActivity extends TCBaseActivity implements
         }
       }
     });
-    request.getCities(currentStart, PERPAGE_COUNT);
+      request.getCities(currentStart, PERPAGE_COUNT);
   }
 
   @Override

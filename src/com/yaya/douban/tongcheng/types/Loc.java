@@ -7,11 +7,11 @@ package com.yaya.douban.tongcheng.types;
  * 
  */
 public class Loc {
-  private String parent;
-  private String habitable;
-  private String id;
-  private String name;
-  private String uid;
+  private String parent="";
+  private String habitable="";
+  private String id="";
+  private String name="";
+  private String uid="";
 
   public String getParent() {
     return parent;

@@ -151,6 +151,7 @@ public class MainActivityNew extends ActivityGroup implements
         callbacks[currentTab].onRightButtonClicked();
       }
     } else if (id == R.id.page_title_2) {
+
       Intent intent = new Intent(MainActivityNew.this, LocsChooseActivity.class);
       intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
       startActivity(intent);

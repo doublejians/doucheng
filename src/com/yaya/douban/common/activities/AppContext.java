@@ -18,6 +18,8 @@ import com.yaya.douban.common.http.BaseDataResponse;
 import com.yaya.douban.common.http.JsonSerializer;
 import com.yaya.douban.common.utils.AppLog;
 import com.yaya.douban.common.utils.IntentUtils;
+import com.yaya.douban.tongcheng.activities.Location;
+import com.yaya.douban.tongcheng.activities.LocsChooseActivity;
 import com.yaya.douban.tongcheng.requests.TCLocListRequest;
 import com.yaya.douban.tongcheng.responses.TCLocListResponse;
 import com.yaya.douban.tongcheng.types.Loc;
@@ -44,7 +46,7 @@ public class AppContext extends Application {
   private LinkedHashMap<String, ArrayList<Loc>> disticts = new LinkedHashMap<String, ArrayList<Loc>>();// 缓存所有查看过的城市的区
   private static LinkedHashMap<String, String> eventTypes = new LinkedHashMap<String, String>();// 活动类型
   private static LinkedHashMap<String, String> eventDayTypes = new LinkedHashMap<String, String>();// 活动时间类型
-
+private Location location;
   @Override
   public void onCreate() {
     super.onCreate();
@@ -61,8 +63,13 @@ public class AppContext extends Application {
         .tasksProcessingOrder(QueueProcessingType.LIFO).build();
     ImageLoader.getInstance().init(config);
     instance = this;
+    location = new Location(getApplicationContext());
   }
-
+public Location getLocation(){
+  
+  return location;
+  
+}
   private void loadEventTypes() {
     String[] types = getResources().getStringArray(R.array.tc_event_types);
     for (String type : types) {

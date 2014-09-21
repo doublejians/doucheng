@@ -63,7 +63,7 @@ public class WeeklyHotActivity extends TCBaseActivity implements
       }
     });
     loc = AppContext.getInstance().getCurrentLoc().getId();
-    AppLog.e(TAG, "WeeklyHotActivity: requestEvents2");
+    AppLog.e(TAG, "WeeklyHotActivity: requestEvents2"+loc);
     request.getEvents(loc, district, type, daytype, 0, 10);
   }
 
